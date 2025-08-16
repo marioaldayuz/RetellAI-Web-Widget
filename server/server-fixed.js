@@ -91,16 +91,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Additional CORS headers for maximum compatibility
-app.use((req, res, next) => {
-  // If universal access, set permissive headers
-  if (process.env.UNIVERSAL_ACCESS === 'true' || process.env.ALLOWED_ORIGINS === '*') {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin');
-  }
-  next();
-});
+// Don't add duplicate CORS headers - cors middleware already handles it!
 
 app.use(express.json());
 

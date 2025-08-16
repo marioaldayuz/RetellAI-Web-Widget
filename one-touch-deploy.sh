@@ -153,6 +153,14 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 # Get absolute path
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Copy clean server file
+echo -e "${GREEN}Ensuring clean server without duplicate CORS headers...${NC}"
+if [ -f "server/server-clean.js" ]; then
+    cp server/server-clean.js server/server.js
+elif [ -f "server/server-fixed.js" ]; then
+    cp server/server-fixed.js server/server.js
+fi
+
 # Create systemd service
 sudo tee /etc/systemd/system/retell-widget-backend.service > /dev/null << EOF
 [Unit]

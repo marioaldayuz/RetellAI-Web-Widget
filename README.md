@@ -13,6 +13,12 @@ chmod +x one-touch-deploy.sh
 ./one-touch-deploy.sh YOUR_RETELL_API_KEY your-domain.com your@email.com
 ```
 
+### ⚠️ Had CORS errors? Run this fix:
+```bash
+chmod +x fix-cors-duplicate.sh
+./fix-cors-duplicate.sh
+```
+
 👉 **[ONE-TOUCH-DEPLOY.md](./ONE-TOUCH-DEPLOY.md)** - Complete deployment guide
 
 👉 **[WIDGET-INTEGRATION.md](./WIDGET-INTEGRATION.md)** - How to add widget to your site (fixes "RetellWidget is not defined")

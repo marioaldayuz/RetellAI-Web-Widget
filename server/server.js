@@ -82,10 +82,15 @@ const corsOptions = {
   },
   credentials: false, // Set to false for universal access (more permissive)
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
+// Apply CORS middleware - this handles ALL CORS headers
 app.use(cors(corsOptions));
+
+// IMPORTANT: Don't set duplicate CORS headers elsewhere!
 app.use(express.json());
 
 // Rate limiting - prevent abuse
