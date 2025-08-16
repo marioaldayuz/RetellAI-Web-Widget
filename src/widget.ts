@@ -31,7 +31,7 @@ class RetellWidget {
     this.config = {
       position: 'bottom-right',
       theme: 'purple',
-      proxyEndpoint: 'http://localhost:3001/api/create-web-call',
+      proxyEndpoint: '/api/create-web-call', // Default to relative, but should be full URL for 3rd party sites
       ...config
     };
     this.init();

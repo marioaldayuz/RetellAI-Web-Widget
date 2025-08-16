@@ -1,4 +1,13 @@
-# RetellAI Widget Usage Guide
+# RetellAI Widget Usage Guide - Cross-Domain Deployment
+
+## 🌐 **Important: 3rd Party Site Deployment**
+
+This widget is designed to be **embedded on 3rd party websites** while your backend server runs separately. This means:
+
+- ✅ Widget files hosted on any website
+- ✅ Backend server runs on your domain  
+- ✅ Cross-origin requests properly configured
+- ✅ Full URLs required for API endpoints
 
 ## 🚨 "RetellWidget is not defined" - SOLUTION
 
@@ -35,7 +44,7 @@ This creates:
     <script>
         const widget = new RetellWidget({
             agentId: 'your_agent_id',
-            proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+            proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // MUST be full URL
             position: 'bottom-right',
             theme: 'purple'
         });
@@ -44,12 +53,25 @@ This creates:
 </html>
 ```
 
-### ✅ **Step 3: Backend Setup**
+### ✅ **Step 3: Backend Setup with CORS**
 
-Your backend must implement the proxy endpoint:
+Your backend must implement the proxy endpoint WITH cross-origin support:
 
 ```javascript
-// Example Node.js/Express endpoint
+// Example Node.js/Express endpoint with CORS
+const cors = require('cors');
+
+// Configure CORS for 3rd party sites
+app.use('/api', cors({
+  origin: [
+    'https://client-website-1.com',
+    'https://client-website-2.com', 
+    'https://any-3rd-party-site.com'
+    // Add all domains that will embed your widget
+  ],
+  credentials: true
+}));
+
 app.post('/api/create-web-call', async (req, res) => {
   try {
     const { agent_id } = req.body;
@@ -86,7 +108,7 @@ app.post('/api/create-web-call', async (req, res) => {
   document.addEventListener('DOMContentLoaded', function() {
     const widget = new RetellWidget({
       agentId: 'your_agent_id',
-      proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+      proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // Full URL required
       position: 'bottom-right',
       theme: 'purple'
     });
@@ -101,7 +123,7 @@ app.post('/api/create-web-call', async (req, res) => {
 <script>
   window.retellWidgetConfig = {
     agentId: 'your_agent_id',
-    proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+    proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // Full URL required
     position: 'bottom-right',
     theme: 'purple'
   };
@@ -119,8 +141,10 @@ const widget = new RetellWidget({
   // Required
   agentId: 'your_agent_id',
   
+  // Required for 3rd party sites (must be full URL)
+  proxyEndpoint: 'https://your-backend-server.com/api/create-web-call',
+  
   // Optional
-  proxyEndpoint: 'https://yourdomain.com/api/create-web-call', // Default: localhost:3001
   position: 'bottom-right',  // bottom-right, bottom-left, top-right, top-left
   theme: 'purple'            // purple, blue, green
 });
@@ -139,16 +163,34 @@ widget.minimize();
 widget.destroy();
 ```
 
-## 📁 **File Structure for Deployment**
+## 📁 **Cross-Domain Deployment Structure**
 
+### 3rd Party Website (any domain):
 ```
-your-website/
-├── index.html
-├── dist/
-│   ├── retell-widget.js     ← Built widget (from npm run build)
-│   └── retell-widget.css    ← Built styles (from npm run build)
+client-website.com/
+├── index.html               ← Embeds your widget
+├── assets/
+│   ├── retell-widget.js     ← Your widget files
+│   └── retell-widget.css    ← Your widget styles
+└── (their content)
+```
+
+### Your Backend Server (your domain):
+```
+your-backend-server.com/
+├── server.js                ← Your Express/Node.js server
+├── .env                     ← RETELL_API_KEY
 └── api/
-    └── create-web-call      ← Your backend endpoint
+    └── create-web-call      ← CORS-enabled endpoint
+```
+
+### CDN Distribution (recommended):
+```
+cdn.your-domain.com/
+├── v1/
+│   ├── retell-widget.js     ← Hosted widget
+│   └── retell-widget.css    ← Hosted styles
+└── (versioning)
 ```
 
 ## 🔧 **Troubleshooting**
@@ -160,8 +202,10 @@ your-website/
 
 ### "Failed to start call"
 - ✅ Verify your backend endpoint is running
-- ✅ Check CORS settings allow your domain
+- ✅ Check CORS settings allow the 3rd party domain
+- ✅ Use full URL for proxyEndpoint (not relative path)
 - ✅ Ensure your backend returns `{ access_token: "..." }`
+- ✅ Check browser network tab for CORS errors
 
 ### Widget not appearing
 - ✅ Include `retell-widget.css`

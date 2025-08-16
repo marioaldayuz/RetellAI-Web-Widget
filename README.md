@@ -285,15 +285,15 @@ sudo ./nginx-setup-fixed.sh api.example.com --www # force www
 
 2. **Include the generated files in your HTML:**
    ```html
-   <!-- Include CSS and JS -->
-   <link rel="stylesheet" href="./dist/retell-widget.css">
-   <script src="./dist/retell-widget.js"></script>
+   <!-- Include CSS and JS (can be hosted on CDN) -->
+   <link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+   <script src="https://your-cdn.com/retell-widget.js"></script>
    
    <!-- Initialize the widget -->
    <script>
      const widget = new RetellWidget({
        agentId: 'your_agent_id',
-       proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+       proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // MUST be full URL for 3rd party sites
        position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
        theme: 'purple' // or 'blue', 'green'
      });
@@ -307,13 +307,13 @@ sudo ./nginx-setup-fixed.sh api.example.com --www # force www
 <script>
   window.retellWidgetConfig = {
     agentId: 'your_agent_id',
-    proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+    proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // Full URL required
     position: 'bottom-right',
     theme: 'purple'
   };
 </script>
-<link rel="stylesheet" href="./dist/retell-widget.css">
-<script src="./dist/retell-widget.js"></script>
+<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+<script src="https://your-cdn.com/retell-widget.js"></script>
 ```
 
 #### Configuration Options
@@ -321,10 +321,25 @@ sudo ./nginx-setup-fixed.sh api.example.com --www # force www
 ```typescript
 interface WidgetConfig {
   agentId: string;                    // Required: Your Retell AI agent ID
-  proxyEndpoint?: string;             // Optional: Backend endpoint (default: localhost:3001)
+  proxyEndpoint?: string;             // Required for 3rd party sites: Full URL to your backend
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   theme?: 'purple' | 'blue' | 'green';
 }
+```
+
+#### 🌐 **Cross-Domain Deployment Notes**
+
+- **Widget files** can be hosted on any CDN or static hosting
+- **Backend server** runs on your domain with CORS enabled
+- **proxyEndpoint** MUST be a full URL when embedded on 3rd party sites
+- **CORS configuration** must allow the embedding domains
+
+Example CORS setup:
+```javascript
+app.use('/api', cors({
+  origin: ['https://client-site.com', 'https://another-client.org'],
+  credentials: true
+}));
 ```
 
 ### 🔍 Testing & Monitoring
@@ -442,6 +457,9 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ### 🤝 Support & Documentation
 
+- **🌐 Cross-Domain Deployment:** See [cross-domain-deployment-guide.md](./cross-domain-deployment-guide.md)
+- **📋 Deployment Checklist:** See [deployment-checklist.md](./deployment-checklist.md)
+- **🎯 Widget Integration:** See [widget-usage-guide.md](./widget-usage-guide.md)
 - **🔧 Systemd Fix:** See [systemd-fix.sh](./systemd-fix.sh) for immediate fixes
 - **📖 Comprehensive Guide:** See [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) for fresh server setups
 - **⚡ Quick Deployment:** See [README-DEPLOYMENT.md](./README-DEPLOYMENT.md) for overview

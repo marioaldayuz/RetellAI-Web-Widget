@@ -1,0 +1,20 @@
+# RetellAI Widget Backend Configuration
+
+# Required: Your Retell AI API Key
+RETELL_API_KEY=your_retell_api_key_here
+
+# Required for Production: Allowed origins for CORS (comma-separated)
+# Format: https://domain.com,https://another-client.org,*.subdomain.com
+ALLOWED_ORIGINS=https://client-website.com,https://another-client.org,*.your-clients.com
+
+# Optional: Server port (default: 3001)
+PORT=3001
+
+# Optional: Node environment (development/production)
+NODE_ENV=production
+
+# Example production configuration:
+# RETELL_API_KEY=retell_sk_abcd1234567890...
+# ALLOWED_ORIGINS=https://widget-client-1.com,https://app.client-2.org,*.clients.mycompany.com
+# PORT=3001
+# NODE_ENV=production

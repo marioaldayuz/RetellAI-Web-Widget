@@ -13,31 +13,63 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration - adjust origins for production
+// CORS configuration for 3rd party site deployment
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
-    // In production, replace with your actual domains
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:3001',
-      // Add your production domains here
-      // 'https://yourdomain.com',
-      // 'https://app.yourdomain.com'
-    ];
+    // For development - allow localhost
+    if (process.env.NODE_ENV === 'development') {
+      const devOrigins = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:8080',
+        'http://127.0.0.1:5173'
+      ];
+      if (devOrigins.some(devOrigin => origin.startsWith(devOrigin))) {
+        return callback(null, true);
+      }
+    }
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+    // Production: Get allowed origins from environment variable
+    const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
+      process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
+    
+    // If no origins configured, warn but allow (for initial setup)
+    if (allowedOrigins.length === 0) {
+      console.warn(`⚠️  WARNING: No ALLOWED_ORIGINS configured. Request from: ${origin}`);
+      if (process.env.NODE_ENV === 'production') {
+        return callback(new Error('CORS: No allowed origins configured'));
+      }
+      return callback(null, true); // Allow in development
+    }
+    
+    // Check if origin is in allowed list
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      // Exact match
+      if (origin === allowedOrigin) return true;
+      
+      // Wildcard subdomain support (*.example.com)
+      if (allowedOrigin.startsWith('*.')) {
+        const domain = allowedOrigin.slice(2);
+        return origin.endsWith('.' + domain) || origin === domain;
+      }
+      
+      return false;
+    });
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn(`🚫 CORS: Rejected request from: ${origin}`);
+      callback(new Error(`CORS: Origin ${origin} not allowed`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
@@ -158,5 +190,18 @@ app.listen(PORT, () => {
     console.warn('⚠️  Please create a .env file with your API key');
   } else {
     console.log('✅ API key configured');
+  }
+  
+  // Check CORS configuration
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.ALLOWED_ORIGINS) {
+      console.warn('⚠️  WARNING: ALLOWED_ORIGINS not configured for production!');
+      console.warn('⚠️  Set ALLOWED_ORIGINS=https://client1.com,https://client2.com');
+    } else {
+      const origins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim());
+      console.log(`✅ CORS configured for origins: ${origins.join(', ')}`);
+    }
+  } else {
+    console.log('🔧 Development mode: CORS allows localhost origins');
   }
 });
