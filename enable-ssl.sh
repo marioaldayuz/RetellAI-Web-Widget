@@ -12,21 +12,70 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Get configuration from command line
-DOMAIN=${1:-""}
-BACKEND_PORT=${2:-3001}
+# Parse command line arguments
+DOMAIN=""
+BACKEND_PORT=3001
+INCLUDE_WWW="auto"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-www)
+            INCLUDE_WWW="false"
+            shift
+            ;;
+        --www)
+            INCLUDE_WWW="true"
+            shift
+            ;;
+        --help|-h)
+            show_usage
+            exit 0
+            ;;
+        *)
+            if [ -z "$DOMAIN" ]; then
+                DOMAIN="$1"
+            elif [[ "$1" =~ ^[0-9]+$ ]]; then
+                BACKEND_PORT="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Auto-detect www support if not explicitly set
+if [ "$INCLUDE_WWW" = "auto" ]; then
+    # Count dots in domain - if more than 1, it's likely a subdomain
+    dot_count=$(echo "$DOMAIN" | tr -cd '.' | wc -c)
+    if [ "$dot_count" -gt 1 ]; then
+        INCLUDE_WWW="false"  # Subdomain - skip www
+    else
+        INCLUDE_WWW="true"   # Root domain - include www
+    fi
+fi
 
 # Function to display usage
 show_usage() {
-    echo "Usage: $0 <domain> [backend_port]"
+    echo "Usage: $0 <domain> [backend_port] [options]"
     echo ""
     echo "Arguments:"
     echo "  domain         - Your domain name (required)"
     echo "  backend_port   - Backend server port (default: 3001)"
     echo ""
-    echo "Example:"
-    echo "  $0 example.com"
-    echo "  $0 example.com 3001"
+    echo "Options:"
+    echo "  --www          - Force include www subdomain"
+    echo "  --no-www       - Force exclude www subdomain"
+    echo "  --help, -h     - Show this help"
+    echo ""
+    echo "Auto-detection:"
+    echo "  - Root domains (example.com) → includes www.example.com"
+    echo "  - Subdomains (sub.example.com) → no www support"
+    echo ""
+    echo "Examples:"
+    echo "  $0 example.com                 # includes www.example.com"
+    echo "  $0 api.example.com             # no www (auto-detected)"
+    echo "  $0 example.com --no-www        # no www (explicit)"
+    echo "  $0 api.example.com --www       # includes www (override)"
 }
 
 # Validate domain
@@ -62,7 +111,11 @@ if [ ! -f "$SSL_CERT_PATH" ] || [ ! -f "$SSL_KEY_PATH" ]; then
     echo "  - $SSL_KEY_PATH"
     echo ""
     echo "Please obtain certificates first:"
-    echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN${NC}"
+    if [ "$INCLUDE_WWW" = "true" ]; then
+        echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN${NC}"
+    else
+        echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN${NC}"
+    fi
     exit 1
 fi
 
@@ -98,7 +151,7 @@ upstream backend_server {
 server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN www.$DOMAIN;
+SERVER_NAME_PLACEHOLDER
 
     # Let's Encrypt renewal
     location /.well-known/acme-challenge/ {
@@ -115,7 +168,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name $DOMAIN www.$DOMAIN;
+SERVER_NAME_PLACEHOLDER
 
     # SSL Configuration
     ssl_certificate $SSL_CERT_PATH;
@@ -230,6 +283,9 @@ server {
 }
 EOF
 
+# Replace placeholder with actual server_name directive
+sed -i "s|SERVER_NAME_PLACEHOLDER|$SERVER_NAME_DIRECTIVE|" /etc/nginx/sites-available/retell-widget
+
 # Test configuration
 echo -e "${GREEN}Testing new configuration...${NC}"
 if nginx -t; then
@@ -246,7 +302,6 @@ if nginx -t; then
     echo ""
     echo "Your site is now available at:"
     echo -e "${BLUE}🔒 https://$DOMAIN${NC}"
-    echo -e "${BLUE}🔒 https://www.$DOMAIN${NC}"
     echo ""
     echo -e "${YELLOW}Important Information:${NC}"
     echo "• HTTP traffic automatically redirects to HTTPS"

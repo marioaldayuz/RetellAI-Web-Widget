@@ -66,7 +66,7 @@ upstream frontend_server {
 server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name $DOMAIN;
 
     # Redirect all HTTP traffic to HTTPS
     return 301 https://\$server_name\$request_uri;
@@ -76,7 +76,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name $DOMAIN;
 
     # SSL Configuration (will be managed by Certbot)
     # ssl_certificate $SSL_CERT_PATH;
@@ -231,7 +231,7 @@ echo ""
 echo "Next steps:"
 echo "1. Update the DOMAIN variable in this script or pass it as an argument"
 echo "2. Run: sudo ./nginx-setup.sh yourdomain.com"
-echo "3. Set up SSL certificate: sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN"
+echo "3. Set up SSL certificate: sudo certbot --nginx -d $DOMAIN"
 echo "4. Build your frontend: npm run build"
 echo "5. Copy dist files to: /var/www/retell-widget/dist/"
 echo "6. Start your backend server with PM2 or systemd"

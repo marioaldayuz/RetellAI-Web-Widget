@@ -12,15 +12,59 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Get configuration from command line or use defaults
-DOMAIN=${1:-""}
-BACKEND_PORT=${2:-3001}
-FRONTEND_PORT=${3:-5173}
-EMAIL=${4:-""}
+# Parse command line arguments
+DOMAIN=""
+BACKEND_PORT=3001
+FRONTEND_PORT=5173
+EMAIL=""
+INCLUDE_WWW="auto"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-www)
+            INCLUDE_WWW="false"
+            shift
+            ;;
+        --www)
+            INCLUDE_WWW="true"
+            shift
+            ;;
+        --help|-h)
+            show_usage
+            exit 0
+            ;;
+        *)
+            if [ -z "$DOMAIN" ]; then
+                DOMAIN="$1"
+            elif [[ "$1" =~ ^[0-9]+$ ]]; then
+                if [ "$BACKEND_PORT" = "3001" ]; then
+                    BACKEND_PORT="$1"
+                elif [ "$FRONTEND_PORT" = "5173" ]; then
+                    FRONTEND_PORT="$1"
+                fi
+            elif [[ "$1" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+                EMAIL="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Auto-detect www support if not explicitly set
+if [ "$INCLUDE_WWW" = "auto" ]; then
+    # Count dots in domain - if more than 1, it's likely a subdomain
+    dot_count=$(echo "$DOMAIN" | tr -cd '.' | wc -c)
+    if [ "$dot_count" -gt 1 ]; then
+        INCLUDE_WWW="false"  # Subdomain - skip www
+    else
+        INCLUDE_WWW="true"   # Root domain - include www
+    fi
+fi
 
 # Function to display usage
 show_usage() {
-    echo "Usage: $0 <domain> [backend_port] [frontend_port] [email]"
+    echo "Usage: $0 <domain> [backend_port] [frontend_port] [email] [options]"
     echo ""
     echo "Arguments:"
     echo "  domain         - Your domain name (required)"
@@ -28,8 +72,20 @@ show_usage() {
     echo "  frontend_port  - Frontend dev server port (default: 5173)"
     echo "  email         - Email for SSL certificate (optional)"
     echo ""
-    echo "Example:"
-    echo "  $0 example.com"
+    echo "Options:"
+    echo "  --www          - Force include www subdomain"
+    echo "  --no-www       - Force exclude www subdomain"
+    echo "  --help, -h     - Show this help"
+    echo ""
+    echo "Auto-detection:"
+    echo "  - Root domains (example.com) → includes www.example.com"
+    echo "  - Subdomains (sub.example.com) → no www support"
+    echo ""
+    echo "Examples:"
+    echo "  $0 example.com                    # includes www.example.com"
+    echo "  $0 api.example.com                # no www (auto-detected)"
+    echo "  $0 example.com --no-www           # no www (explicit)"
+    echo "  $0 api.example.com --www          # includes www (override)"
     echo "  $0 example.com 3001 5173 admin@example.com"
 }
 
@@ -71,8 +127,14 @@ if ! command -v certbot &> /dev/null; then
     apt-get install -y certbot python3-certbot-nginx
 fi
 
-# Create initial HTTP-only Nginx configuration for Let's Encrypt
-echo -e "${GREEN}Creating initial HTTP-only Nginx configuration for $DOMAIN...${NC}"
+# Build server_name directive based on www settings
+if [ "$INCLUDE_WWW" = "true" ]; then
+    SERVER_NAME_DIRECTIVE="    server_name $DOMAIN www.$DOMAIN;"
+    echo -e "${GREEN}Creating initial HTTP-only Nginx configuration for $DOMAIN (including www.$DOMAIN)...${NC}"
+else
+    SERVER_NAME_DIRECTIVE="    server_name $DOMAIN;"
+    echo -e "${GREEN}Creating initial HTTP-only Nginx configuration for $DOMAIN (single domain only)...${NC}"
+fi
 
 cat > /etc/nginx/sites-available/retell-widget << EOF
 # Retell AI Widget - Nginx Configuration (HTTP for Let's Encrypt)
@@ -97,7 +159,7 @@ upstream frontend_server {
 server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN www.$DOMAIN;
+SERVER_NAME_PLACEHOLDER
 
     # Logging
     access_log /var/log/nginx/${DOMAIN}-access.log;
@@ -189,6 +251,9 @@ server {
 }
 EOF
 
+# Replace placeholder with actual server_name directive
+sed -i "s|SERVER_NAME_PLACEHOLDER|$SERVER_NAME_DIRECTIVE|" /etc/nginx/sites-available/retell-widget
+
 echo -e "${GREEN}Initial HTTP configuration created successfully!${NC}"
 
 # Create directory for Let's Encrypt challenges
@@ -232,9 +297,17 @@ echo -e "${GREEN}Next Steps:${NC}"
 echo ""
 echo "1. ${YELLOW}Obtain SSL certificate:${NC}"
 if [ -n "$EMAIL" ]; then
-    echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email $EMAIL"
+    if [ "$INCLUDE_WWW" = "true" ]; then
+        echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email $EMAIL"
+    else
+        echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN --non-interactive --agree-tos --email $EMAIL"
+    fi
 else
-    echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN"
+    if [ "$INCLUDE_WWW" = "true" ]; then
+        echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN"
+    else
+        echo "   sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN"
+    fi
 fi
 echo ""
 echo "2. ${YELLOW}Enable SSL after certificate is obtained:${NC}"

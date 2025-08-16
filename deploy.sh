@@ -12,23 +12,74 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Configuration from command line
-DOMAIN=${1:-""}
-DEPLOY_TYPE=${2:-"nginx"} # nginx, docker, or manual
-EMAIL=${3:-""}
+# Parse command line arguments
+DOMAIN=""
+DEPLOY_TYPE="nginx"
+EMAIL=""
+INCLUDE_WWW="auto"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-www)
+            INCLUDE_WWW="false"
+            shift
+            ;;
+        --www)
+            INCLUDE_WWW="true"
+            shift
+            ;;
+        --help|-h)
+            show_usage
+            exit 0
+            ;;
+        *)
+            if [ -z "$DOMAIN" ]; then
+                DOMAIN="$1"
+            elif [ -z "$DEPLOY_TYPE" ] || [[ "$1" =~ ^(nginx|docker|manual)$ ]]; then
+                DEPLOY_TYPE="$1"
+            elif [[ "$1" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+                EMAIL="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Auto-detect www support if not explicitly set
+if [ "$INCLUDE_WWW" = "auto" ]; then
+    # Count dots in domain - if more than 1, it's likely a subdomain
+    dot_count=$(echo "$DOMAIN" | tr -cd '.' | wc -c)
+    if [ "$dot_count" -gt 1 ]; then
+        INCLUDE_WWW="false"  # Subdomain - skip www
+    else
+        INCLUDE_WWW="true"   # Root domain - include www
+    fi
+fi
 
 # Function to display usage
 show_usage() {
-    echo "Usage: $0 <domain> [deploy_type] [email]"
+    echo "Usage: $0 <domain> [deploy_type] [email] [options]"
     echo ""
     echo "Arguments:"
     echo "  domain       - Your domain name (required for nginx deployment)"
     echo "  deploy_type  - Deployment type: nginx, docker, or manual (default: nginx)"
     echo "  email        - Email for SSL certificate (optional)"
     echo ""
+    echo "Options:"
+    echo "  --www        - Force include www subdomain"
+    echo "  --no-www     - Force exclude www subdomain"
+    echo "  --help, -h   - Show this help"
+    echo ""
+    echo "Auto-detection:"
+    echo "  - Root domains (example.com) → includes www.example.com"
+    echo "  - Subdomains (api.example.com) → no www support"
+    echo ""
     echo "Examples:"
-    echo "  $0 example.com"
+    echo "  $0 example.com                           # includes www.example.com"
+    echo "  $0 api.example.com                       # no www (auto-detected)"
     echo "  $0 example.com nginx admin@example.com"
+    echo "  $0 example.com --no-www                  # no www (explicit)"
     echo "  $0 localhost docker"
     echo ""
 }
@@ -121,7 +172,11 @@ deploy_nginx() {
     chmod +x nginx-setup-fixed.sh enable-ssl.sh systemd-setup.sh
     
     # Run Nginx setup
-    sudo ./nginx-setup-fixed.sh $DOMAIN
+    if [ "$INCLUDE_WWW" = "true" ]; then
+        sudo ./nginx-setup-fixed.sh $DOMAIN 3001 5173 $EMAIL --www
+    else
+        sudo ./nginx-setup-fixed.sh $DOMAIN 3001 5173 $EMAIL --no-www
+    fi
     
     # Setup systemd service
     if [ -f systemd-setup.sh ]; then
@@ -138,14 +193,26 @@ deploy_nginx() {
     echo -e "${YELLOW}Setting up SSL certificate for $DOMAIN...${NC}"
     
     if [ -n "$EMAIL" ]; then
-        sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email $EMAIL
+        if [ "$INCLUDE_WWW" = "true" ]; then
+            sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email $EMAIL
+        else
+            sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN --non-interactive --agree-tos --email $EMAIL
+        fi
     else
         echo -e "${YELLOW}No email provided. Certbot will prompt for email.${NC}"
-        sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN
+        if [ "$INCLUDE_WWW" = "true" ]; then
+            sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN
+        else
+            sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN
+        fi
     fi
     
     # Enable SSL
-    sudo ./enable-ssl.sh $DOMAIN
+    if [ "$INCLUDE_WWW" = "true" ]; then
+        sudo ./enable-ssl.sh $DOMAIN --www
+    else
+        sudo ./enable-ssl.sh $DOMAIN --no-www
+    fi
     
     echo -e "${GREEN}✓ Nginx deployment complete${NC}"
 }
@@ -234,7 +301,6 @@ main() {
     if [ "$DEPLOY_TYPE" == "nginx" ]; then
         echo "Your widget is now available at:"
         echo -e "${BLUE}🔒 https://$DOMAIN${NC}"
-        echo -e "${BLUE}🔒 https://www.$DOMAIN${NC}"
     elif [ "$DEPLOY_TYPE" == "docker" ]; then
         echo "Your widget is now available at:"
         echo -e "${BLUE}http://localhost${NC}"

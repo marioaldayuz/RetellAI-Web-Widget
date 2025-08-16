@@ -129,7 +129,6 @@ sudo ./systemd-setup.sh
 sudo certbot certonly --webroot \
   -w /var/www/certbot \
   -d yourdomain.com \
-  -d www.yourdomain.com \
   --email admin@yourdomain.com
 
 # Step 4: Enable HTTPS
@@ -197,6 +196,25 @@ All scripts accept domains as parameters - no modification needed!
 | `quick-fix.sh` | Fix SSL issues | `./quick-fix.sh yourdomain.com` |
 | `systemd-setup.sh` | Backend service (FIXED) | `./systemd-setup.sh` |
 | `systemd-fix.sh` | **NEW:** Fix broken systemd | `sudo ./systemd-fix.sh` |
+
+### 🌐 Domain Configuration
+
+All scripts now support **intelligent www detection**:
+
+- **Root domains** (`example.com`) → automatically includes `www.example.com`
+- **Subdomains** (`api.example.com`) → no www support (auto-detected)
+- **Override options** available: `--www` or `--no-www`
+
+**Examples:**
+```bash
+# Auto-detection (recommended)
+sudo ./nginx-setup-fixed.sh example.com          # includes www
+sudo ./nginx-setup-fixed.sh api.example.com      # no www
+
+# Explicit control
+sudo ./nginx-setup-fixed.sh example.com --no-www # force no www
+sudo ./nginx-setup-fixed.sh api.example.com --www # force www
+```
 
 ### 🔐 Production Security Checklist
 

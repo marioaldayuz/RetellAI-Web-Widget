@@ -86,7 +86,7 @@ sudo cp -r dist/* /var/www/retell-widget/dist/
 sudo tee /etc/nginx/sites-available/retell-widget << 'EOF'
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name yourdomain.com;
     
     # Frontend
     location / {
@@ -147,19 +147,19 @@ sudo systemctl status retell-widget-backend
 
 ```bash
 # Obtain SSL certificate
-sudo certbot certonly --webroot -w /var/www/certbot -d yourdomain.com -d www.yourdomain.com
+sudo certbot certonly --webroot -w /var/www/certbot -d yourdomain.com
 
 # Update Nginx config for SSL
 sudo tee /etc/nginx/sites-available/retell-widget << 'EOF'
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name yourdomain.com;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name yourdomain.com;
 
     ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;

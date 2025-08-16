@@ -54,7 +54,7 @@ cat > /etc/nginx/sites-available/retell-widget-temp << EOF
 server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN www.$DOMAIN;
+SERVER_NAME_PLACEHOLDER
 
     # Let's Encrypt challenge
     location /.well-known/acme-challenge/ {
@@ -68,6 +68,14 @@ server {
     }
 }
 EOF
+
+# Build and replace server_name directive
+if [ "$INCLUDE_WWW" = "true" ]; then
+    SERVER_NAME_DIRECTIVE="    server_name $DOMAIN www.$DOMAIN;"
+else
+    SERVER_NAME_DIRECTIVE="    server_name $DOMAIN;"
+fi
+sed -i "s|SERVER_NAME_PLACEHOLDER|$SERVER_NAME_DIRECTIVE|" /etc/nginx/sites-available/retell-widget-temp
 
 # Create certbot directory
 mkdir -p /var/www/certbot
@@ -99,7 +107,11 @@ echo ""
 echo "Next steps:"
 echo ""
 echo "1. Get SSL certificate (replace email):"
-echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email your-email@example.com${NC}"
+if [ "$INCLUDE_WWW" = "true" ]; then
+    echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email your-email@example.com${NC}"
+else
+    echo -e "${YELLOW}sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN --non-interactive --agree-tos --email your-email@example.com${NC}"
+fi
 echo ""
 echo "2. After certificate is obtained, enable SSL:"
 echo -e "${YELLOW}sudo ./enable-ssl.sh $DOMAIN${NC}"

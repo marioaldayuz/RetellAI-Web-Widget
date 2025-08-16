@@ -99,7 +99,6 @@ sudo ./nginx-setup-fixed.sh yourdomain.com
 sudo certbot certonly --webroot \
   -w /var/www/certbot \
   -d yourdomain.com \
-  -d www.yourdomain.com \
   --email admin@yourdomain.com
 ```
 
