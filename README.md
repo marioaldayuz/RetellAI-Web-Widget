@@ -4,11 +4,20 @@ A beautiful, embeddable voice call widget for Retell AI with enterprise-grade se
 
 > **🚀 Ready to Clone & Deploy**: This repository is designed for easy cloning and deployment by anyone.
 
-## 🎯 **New Here? Start Here!**
+## 🎯 **New Here? ONE COMMAND DEPLOYMENT!**
 
-👉 **[GETTING-STARTED.md](./GETTING-STARTED.md)** - Complete one-command setup guide
+```bash
+git clone https://github.com/yourusername/RetellAI-Web-Widget.git
+cd RetellAI-Web-Widget
+chmod +x one-touch-deploy.sh
+./one-touch-deploy.sh YOUR_RETELL_API_KEY your-domain.com your@email.com
+```
 
-👉 **[CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md)** - Detailed deployment instructions
+👉 **[ONE-TOUCH-DEPLOY.md](./ONE-TOUCH-DEPLOY.md)** - Complete deployment guide
+
+👉 **[GETTING-STARTED.md](./GETTING-STARTED.md)** - Manual setup guide
+
+👉 **[CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md)** - Detailed instructions
 
 ## ⚡ Recent Improvements (v2.1 - Systemd Fix)
 
