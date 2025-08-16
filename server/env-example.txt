@@ -3,9 +3,16 @@
 # Required: Your Retell AI API Key
 RETELL_API_KEY=your_retell_api_key_here
 
-# Required for Production: Allowed origins for CORS (comma-separated)
-# Format: https://domain.com,https://another-client.org,*.subdomain.com
-ALLOWED_ORIGINS=https://client-website.com,https://another-client.org,*.your-clients.com
+# CORS Configuration - Choose ONE option:
+
+# Option 1: UNIVERSAL ACCESS - Allow embedding on ANY website
+UNIVERSAL_ACCESS=true
+
+# Option 2: WILDCARD ACCESS - Allow any domain (alternative to UNIVERSAL_ACCESS)
+# ALLOWED_ORIGINS=*
+
+# Option 3: SPECIFIC DOMAINS - Only allow certain websites
+# ALLOWED_ORIGINS=https://client-website.com,https://another-client.org,*.your-clients.com
 
 # Optional: Server port (default: 3001)
 PORT=3001
@@ -13,8 +20,21 @@ PORT=3001
 # Optional: Node environment (development/production)
 NODE_ENV=production
 
-# Example production configuration:
+# ===============================================
+# EXAMPLE CONFIGURATIONS:
+# ===============================================
+
+# FOR PUBLIC WIDGET (anyone can embed):
 # RETELL_API_KEY=retell_sk_abcd1234567890...
-# ALLOWED_ORIGINS=https://widget-client-1.com,https://app.client-2.org,*.clients.mycompany.com
-# PORT=3001
+# UNIVERSAL_ACCESS=true
+# NODE_ENV=production
+
+# FOR WILDCARD ACCESS (any domain):
+# RETELL_API_KEY=retell_sk_abcd1234567890...
+# ALLOWED_ORIGINS=*
+# NODE_ENV=production
+
+# FOR SPECIFIC CLIENTS ONLY:
+# RETELL_API_KEY=retell_sk_abcd1234567890...
+# ALLOWED_ORIGINS=https://client1.com,https://client2.org,*.clients.example.com
 # NODE_ENV=production

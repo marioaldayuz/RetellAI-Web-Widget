@@ -327,19 +327,39 @@ interface WidgetConfig {
 }
 ```
 
-#### 🌐 **Cross-Domain Deployment Notes**
+#### 🌐 **Deployment Options**
 
-- **Widget files** can be hosted on any CDN or static hosting
-- **Backend server** runs on your domain with CORS enabled
-- **proxyEndpoint** MUST be a full URL when embedded on 3rd party sites
-- **CORS configuration** must allow the embedding domains
+Choose the right deployment mode for your use case:
 
-Example CORS setup:
-```javascript
-app.use('/api', cors({
-  origin: ['https://client-site.com', 'https://another-client.org'],
-  credentials: true
-}));
+**1. Universal Access (Anyone can embed):**
+```bash
+# .env configuration
+UNIVERSAL_ACCESS=true
+```
+
+**2. Wildcard Access (Any domain):**
+```bash
+# .env configuration  
+ALLOWED_ORIGINS=*
+```
+
+**3. Specific Domains Only:**
+```bash
+# .env configuration
+ALLOWED_ORIGINS=https://client1.com,https://client2.com,*.clients.example.com
+```
+
+**Universal Integration Example:**
+```html
+<!-- Can be embedded on ANY website -->
+<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+<script src="https://your-cdn.com/retell-widget.js"></script>
+<script>
+  new RetellWidget({
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://your-backend.com/api/create-web-call'
+  });
+</script>
 ```
 
 ### 🔍 Testing & Monitoring
@@ -457,6 +477,7 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ### 🤝 Support & Documentation
 
+- **🌍 Universal Widget Deployment:** See [universal-widget-deployment.md](./universal-widget-deployment.md)
 - **🌐 Cross-Domain Deployment:** See [cross-domain-deployment-guide.md](./cross-domain-deployment-guide.md)
 - **📋 Deployment Checklist:** See [deployment-checklist.md](./deployment-checklist.md)
 - **🎯 Widget Integration:** See [widget-usage-guide.md](./widget-usage-guide.md)

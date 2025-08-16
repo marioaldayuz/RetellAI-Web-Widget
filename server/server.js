@@ -13,11 +13,17 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration for 3rd party site deployment
+// CORS configuration for universal widget deployment
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
+    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
+    
+    // Check for universal access mode
+    if (process.env.UNIVERSAL_ACCESS === 'true') {
+      console.log(`✅ Universal access: Allowing request from: ${origin}`);
+      return callback(null, true);
+    }
     
     // For development - allow localhost
     if (process.env.NODE_ENV === 'development') {
@@ -37,11 +43,17 @@ const corsOptions = {
     const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
       process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
     
-    // If no origins configured, warn but allow (for initial setup)
+    // Special handling for wildcard
+    if (allowedOrigins.includes('*')) {
+      console.log(`🌐 Wildcard access: Allowing request from: ${origin}`);
+      return callback(null, true);
+    }
+    
+    // If no origins configured, decide based on environment
     if (allowedOrigins.length === 0) {
       console.warn(`⚠️  WARNING: No ALLOWED_ORIGINS configured. Request from: ${origin}`);
       if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('CORS: No allowed origins configured'));
+        return callback(new Error('CORS: No allowed origins configured. Set ALLOWED_ORIGINS=* for universal access.'));
       }
       return callback(null, true); // Allow in development
     }
@@ -61,15 +73,16 @@ const corsOptions = {
     });
     
     if (isAllowed) {
+      console.log(`✅ Allowed origin: ${origin}`);
       callback(null, true);
     } else {
       console.warn(`🚫 CORS: Rejected request from: ${origin}`);
-      callback(new Error(`CORS: Origin ${origin} not allowed`));
+      callback(new Error(`CORS: Origin ${origin} not allowed. Add to ALLOWED_ORIGINS or set ALLOWED_ORIGINS=* for universal access.`));
     }
   },
-  credentials: true,
+  credentials: false, // Set to false for universal access (more permissive)
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 };
 
 app.use(cors(corsOptions));
@@ -193,13 +206,23 @@ app.listen(PORT, () => {
   }
   
   // Check CORS configuration
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.UNIVERSAL_ACCESS === 'true') {
+    console.log('🌐 UNIVERSAL ACCESS MODE: Widget can be embedded on ANY website');
+    console.log('⚠️  WARNING: This allows ALL domains. Only use if you want a public widget.');
+  } else if (process.env.NODE_ENV === 'production') {
     if (!process.env.ALLOWED_ORIGINS) {
       console.warn('⚠️  WARNING: ALLOWED_ORIGINS not configured for production!');
-      console.warn('⚠️  Set ALLOWED_ORIGINS=https://client1.com,https://client2.com');
+      console.warn('⚠️  Options:');
+      console.warn('   - Set ALLOWED_ORIGINS=* for universal access');
+      console.warn('   - Set ALLOWED_ORIGINS=https://client1.com,https://client2.com for specific domains');
+      console.warn('   - Set UNIVERSAL_ACCESS=true for completely open access');
     } else {
       const origins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim());
-      console.log(`✅ CORS configured for origins: ${origins.join(', ')}`);
+      if (origins.includes('*')) {
+        console.log('🌐 WILDCARD ACCESS: Widget can be embedded on ANY website');
+      } else {
+        console.log(`✅ CORS configured for specific origins: ${origins.join(', ')}`);
+      }
     }
   } else {
     console.log('🔧 Development mode: CORS allows localhost origins');
