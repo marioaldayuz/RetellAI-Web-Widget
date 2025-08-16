@@ -3,184 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetellAI Widget Example</title>
+    <title>RetellAI Widget - Beautiful Intercom-Style Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
+        .feature-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
         }
-        .title {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .code-block {
-            background: #0f172a;
+            background: #1e293b;
+            color: #e2e8f0;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            font-family: 'Courier New', monospace;
-            border: 1px solid #334155;
             overflow-x: auto;
         }
-        .demo-controls {
-            margin: 30px 0;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
         }
-        .demo-button {
-            background: linear-gradient(135deg, #9333ea, #a855f7);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .demo-button:hover {
-            transform: scale(1.05);
-        }
-        .demo-button.blue {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-        }
-        .demo-button.green {
-            background: linear-gradient(135deg, #059669, #10b981);
-        }
-        .note {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
+        .highlight {
+            color: #fbbf24;
         }
     </style>
-    <!-- Include the RetellAI Widget CSS and JS -->
-    <link rel="stylesheet" href="./dist/retell-widget.css">
-    <script src="./dist/retell-widget.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">RetellAI Widget Integration Example</h1>
-        
-        <div class="note">
-            <strong>🎉 Widget Ready!</strong> Look for the AI assistant widget in the bottom-right corner.
-            You can interact with it to start a voice conversation.
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4">
+                RetellAI Widget
+            </h1>
+            <p class="text-xl text-white/90 mb-8">
+                Beautiful Intercom-Style Voice Assistant for Your Website
+            </p>
+            <div class="inline-flex gap-4">
+                <span class="px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm">
+                    ✨ Customizable Colors
+                </span>
+                <span class="px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm">
+                    🎨 Font Awesome Icons
+                </span>
+                <span class="px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm">
+                    🎵 Sound Wave Animations
+                </span>
+            </div>
         </div>
 
-        <h2>📝 How to integrate:</h2>
-        <div class="code-block">
-&lt;!-- 1. Include the CSS and JS files --&gt;
-&lt;link rel="stylesheet" href="./dist/retell-widget.css"&gt;
-&lt;script src="./dist/retell-widget.js"&gt;&lt;/script&gt;
+        <!-- Features Grid -->
+        <div class="grid md:grid-cols-2 gap-6 mb-12">
+            <div class="feature-card p-6 rounded-xl shadow-xl">
+                <h2 class="text-2xl font-bold gradient-text mb-4">🎨 Fully Customizable</h2>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Custom colors to match your brand</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Choose from 1000+ Font Awesome icons</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Personalized welcome messages</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Custom button labels</span>
+                    </li>
+                </ul>
+            </div>
 
-&lt;!-- 2. Initialize the widget --&gt;
-&lt;script&gt;
-  // Create the widget
-  const widget = new RetellWidget({
-    agentId: 'your_agent_id',
-    proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
-    position: 'bottom-right',
-    theme: 'purple'
-  });
-&lt;/script&gt;
+            <div class="feature-card p-6 rounded-xl shadow-xl">
+                <h2 class="text-2xl font-bold gradient-text mb-4">🚀 Modern Design</h2>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Intercom-style floating bubble</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Smooth animations & transitions</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Sound wave visualization</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Responsive mobile design</span>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <h2>🎮 Try different configurations:</h2>
-        <div class="demo-controls">
-            <button class="demo-button" onclick="createWidget('bottom-right', 'purple')">Bottom Right - Purple</button>
-            <button class="demo-button" onclick="createWidget('bottom-left', 'blue')">Bottom Left - Blue</button>
-            <button class="demo-button" onclick="createWidget('top-right', 'green')">Top Right - Green</button>
-            <button class="demo-button" onclick="createWidget('top-left', 'purple')">Top Left - Purple</button>
+        <!-- Configuration Examples -->
+        <div class="feature-card p-6 rounded-xl shadow-xl mb-12">
+            <h2 class="text-2xl font-bold gradient-text mb-6">💻 Easy Integration</h2>
+            
+            <div class="space-y-6">
+                <!-- Example 1: Default -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Default Configuration</h3>
+                    <div class="code-block">
+                        <pre><span class="highlight">// Basic setup with default styling</span>
+new RetellWidget({
+    agentId: '<span class="highlight">your_agent_id</span>',
+    proxyEndpoint: '<span class="highlight">http://localhost:3000/api/create-web-call</span>'
+});</pre>
+                    </div>
+                </div>
+
+                <!-- Example 2: Custom Colors -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Custom Brand Colors</h3>
+                    <div class="code-block">
+                        <pre><span class="highlight">// Match your brand colors</span>
+new RetellWidget({
+    agentId: '<span class="highlight">your_agent_id</span>',
+    proxyEndpoint: '<span class="highlight">http://localhost:3000/api/create-web-call</span>',
+    primaryColor: '<span class="highlight">#2563eb</span>',     <span class="highlight">// Blue</span>
+    secondaryColor: '<span class="highlight">#3b82f6</span>',   <span class="highlight">// Light Blue</span>
+    position: 'bottom-right'
+});</pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Custom Icon & Message -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Custom Icon & Welcome Message</h3>
+                    <div class="code-block">
+                        <pre><span class="highlight">// Personalize the experience</span>
+new RetellWidget({
+    agentId: '<span class="highlight">your_agent_id</span>',
+    proxyEndpoint: '<span class="highlight">http://localhost:3000/api/create-web-call</span>',
+    bubbleIcon: '<span class="highlight">fa-robot</span>',          <span class="highlight">// Font Awesome icon</span>
+    welcomeMessage: '<span class="highlight">Hi! Need help finding the perfect product?</span>',
+    buttonLabel: '<span class="highlight">Talk to AI Assistant</span>',
+    primaryColor: '<span class="highlight">#059669</span>',     <span class="highlight">// Green</span>
+    secondaryColor: '<span class="highlight">#10b981</span>'    <span class="highlight">// Light Green</span>
+});</pre>
+                    </div>
+                </div>
+
+                <!-- Example 4: Support Agent Style -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Support Agent Configuration</h3>
+                    <div class="code-block">
+                        <pre><span class="highlight">// Customer support setup</span>
+new RetellWidget({
+    agentId: '<span class="highlight">your_agent_id</span>',
+    proxyEndpoint: '<span class="highlight">http://localhost:3000/api/create-web-call</span>',
+    bubbleIcon: '<span class="highlight">fa-headset</span>',
+    welcomeMessage: '<span class="highlight">How can our support team help you today?</span>',
+    buttonLabel: '<span class="highlight">Start Support Call</span>',
+    position: 'bottom-left',
+    primaryColor: '<span class="highlight">#dc2626</span>',     <span class="highlight">// Red</span>
+    secondaryColor: '<span class="highlight">#ef4444</span>'    <span class="highlight">// Light Red</span>
+});</pre>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="demo-controls">
-            <button class="demo-button blue" onclick="toggleWidget()">Toggle Widget</button>
-            <button class="demo-button green" onclick="destroyWidget()">Remove Widget</button>
+        <!-- Available Icons -->
+        <div class="feature-card p-6 rounded-xl shadow-xl mb-12">
+            <h2 class="text-2xl font-bold gradient-text mb-4">🎯 Popular Icon Options</h2>
+            <p class="text-gray-700 mb-4">Choose from any Font Awesome icon. Here are some popular choices:</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-headset text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-headset</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-robot text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-robot</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-message text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-message</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-comments text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-comments</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-microphone text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-microphone</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-phone text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-phone</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-user-headset text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-user-headset</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <i class="fas fa-circle-question text-3xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-mono">fa-circle-question</p>
+                </div>
+            </div>
         </div>
 
-        <h2>⚙️ Configuration Options:</h2>
-        <div class="code-block">
-{
-  agentId: 'your_agent_id',           // Required: Your Retell AI agent ID
-  proxyEndpoint: '/api/create-web-call', // Required: Your backend endpoint
-  position: 'bottom-right',           // Optional: Widget position
-  theme: 'purple'                     // Optional: Color theme
-}
-
-// Available positions: 'bottom-right', 'bottom-left', 'top-right', 'top-left'
-// Available themes: 'purple', 'blue', 'green'
-        </div>
-
-        <div class="note">
-            <strong>🔧 Backend Required:</strong> Make sure your backend implements the 
-            <code>/api/create-web-call</code> endpoint that returns an access token.
-            Check the server directory for implementation details.
+        <!-- Try It Now -->
+        <div class="text-center">
+            <div class="feature-card p-8 rounded-xl shadow-xl inline-block">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Try It Now!</h2>
+                <p class="text-gray-700 mb-6">
+                    Click the chat bubble in the bottom-right corner to see the widget in action.
+                </p>
+                <p class="text-sm text-gray-500">
+                    The widget below is configured with purple gradient colors and a headset icon.
+                </p>
+            </div>
         </div>
     </div>
 
-    <script>
-        let currentWidget = null;
-
-        // Initialize the widget on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            createWidget('bottom-right', 'purple');
-        });
-
-        function createWidget(position, theme) {
-            // Destroy existing widget
-            if (currentWidget) {
-                currentWidget.destroy();
-            }
-
-            // Create new widget
-            currentWidget = new RetellWidget({
-                agentId: 'agent_123456789', // Replace with your actual agent ID
-                proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // MUST be full URL for 3rd party sites
-                position: position,
-                theme: theme
-            });
-
-            console.log(`Created widget at ${position} with ${theme} theme`);
-        }
-
-        function toggleWidget() {
-            if (currentWidget) {
-                if (currentWidget.container && currentWidget.container.style.display === 'none') {
-                    currentWidget.show();
-                } else {
-                    currentWidget.minimize();
-                }
-            }
-        }
-
-        function destroyWidget() {
-            if (currentWidget) {
-                currentWidget.destroy();
-                currentWidget = null;
-                console.log('Widget destroyed');
-            }
-        }
-
-        // Error handling
-        window.addEventListener('error', function(e) {
-            console.error('Error:', e.error);
+    <!-- Include the widget -->
+    <script type="module">
+        import RetellWidget from './src/widget.ts';
+        
+        // Initialize with custom configuration
+        new RetellWidget({
+            agentId: 'demo_agent_12345',
+            proxyEndpoint: 'http://localhost:3000/api/create-web-call',
+            position: 'bottom-right',
+            primaryColor: '#9333ea',
+            secondaryColor: '#a855f7',
+            bubbleIcon: 'fa-headset',
+            welcomeMessage: 'Welcome! How can I assist you today?',
+            buttonLabel: 'Start Conversation'
         });
     </script>
+
+    <!-- Font Awesome for demo icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </body>
 </html>

@@ -220,8 +220,14 @@ cat << EOF
   const widget = new RetellWidget({
     agentId: 'your_agent_id_here',  // Replace with your Retell agent ID
     proxyEndpoint: 'https://$YOUR_DOMAIN/api/create-web-call',
-    position: 'bottom-right',  // or 'bottom-left', 'top-right', 'top-left'
-    theme: 'purple'  // or 'blue', 'green'
+    
+    // Optional customization (all fields below are optional)
+    position: 'bottom-right',           // Widget position
+    primaryColor: '#9333ea',            // Primary color
+    secondaryColor: '#a855f7',          // Secondary color  
+    bubbleIcon: 'fa-headset',           // Font Awesome icon
+    welcomeMessage: 'How can I help you today?',  // Welcome text
+    buttonLabel: 'Start Conversation'   // Button text
   });
 </script>
 EOF
