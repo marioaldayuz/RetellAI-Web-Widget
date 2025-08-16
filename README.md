@@ -1,6 +1,6 @@
 # Retell AI Widget - Secure Implementation
 
-A beautiful, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment configurations.
+A beautiful, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment configurations that work with **ANY domain**.
 
 ## 🔒 Security Features
 
@@ -28,11 +28,15 @@ cd ..
 
 ### 2. Configure Environment
 
-The `.env` file is already created with your API key. For production:
+```bash
+# Copy the example environment file
+cp .env.example .env
 
-1. Never commit `.env` to version control
-2. Use environment variables on your hosting platform
-3. Update allowed origins in `server/server.js`
+# Edit .env and add your Retell API key
+nano .env
+```
+
+**Important:** Never commit `.env` to version control!
 
 ### 3. Start Development Servers
 
@@ -54,158 +58,118 @@ npm run dev
 
 ## 📦 Production Deployment
 
+### 🎯 Domain-Agnostic Deployment
+
+All deployment scripts are **fully parameterized** and work with **ANY domain** - no hardcoding required!
+
+### 🚀 One-Command Deployment
+
+Deploy to your domain with a single command:
+
+```bash
+# Deploy to YOUR domain (replace with your actual domain)
+sudo ./deploy.sh yourdomain.com nginx admin@yourdomain.com
+```
+
+This command will:
+- ✅ Install and configure Nginx
+- ✅ Set up SSL certificates (Let's Encrypt)
+- ✅ Configure security headers and rate limiting
+- ✅ Build and deploy your application
+- ✅ Set up systemd service for the backend
+- ✅ Enable HTTPS with auto-renewal
+
 ### 🔧 Deployment Options
 
 #### Option 1: Nginx Reverse Proxy (Recommended)
 
 Perfect for VPS, dedicated servers, or cloud VMs (AWS EC2, DigitalOcean, Linode).
 
-**Setup Steps:**
-
-1. **Prepare your server:**
+**Quick Setup:**
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/retell-widget.git
-cd retell-widget
-
 # Make scripts executable
-chmod +x nginx-setup.sh systemd-setup.sh
+chmod +x *.sh
 
-# Install dependencies
-npm install
-cd server && npm install && cd ..
+# Run deployment with YOUR domain
+sudo ./deploy.sh yourdomain.com nginx admin@yourdomain.com
 ```
 
-2. **Build the frontend:**
+**Manual Setup:**
 ```bash
+# Step 1: Setup Nginx (HTTP only initially)
+sudo ./nginx-setup-fixed.sh yourdomain.com
+
+# Step 2: Get SSL certificate
+sudo certbot certonly --webroot \
+  -w /var/www/certbot \
+  -d yourdomain.com \
+  -d www.yourdomain.com \
+  --email admin@yourdomain.com
+
+# Step 3: Enable HTTPS
+sudo ./enable-ssl.sh yourdomain.com
+
+# Step 4: Deploy application
 npm run build
-```
-
-3. **Setup Nginx proxy:**
-```bash
-# Run with your domain
-sudo ./nginx-setup.sh yourdomain.com
-
-# The script will:
-# - Install Nginx if not present
-# - Create optimized configuration
-# - Set up rate limiting
-# - Configure security headers
-# - Enable HTTPS redirect
-```
-
-4. **Setup SSL certificate:**
-```bash
-# Using Let's Encrypt (free SSL)
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
-
-5. **Setup backend as systemd service:**
-```bash
-# This ensures your backend runs continuously
-sudo ./systemd-setup.sh
-
-# Check service status
-sudo systemctl status retell-widget-backend
-```
-
-6. **Deploy frontend files:**
-```bash
-# Copy built files to web root
 sudo cp -r dist/* /var/www/retell-widget/dist/
-sudo chown -R www-data:www-data /var/www/retell-widget
 ```
-
-**Nginx Configuration Features:**
-- ✅ Rate limiting (10 req/s for API, 30 req/s general)
-- ✅ Gzip compression for better performance
-- ✅ Security headers (HSTS, CSP, X-Frame-Options)
-- ✅ WebSocket support for real-time communication
-- ✅ SSL/TLS with modern cipher suites
-- ✅ Static asset caching (30 days)
-- ✅ Health check endpoint
-- ✅ Logging and monitoring
 
 #### Option 2: Docker Deployment
 
-Perfect for containerized environments and orchestration platforms.
+Perfect for containerized environments:
 
-**Setup Steps:**
-
-1. **Build and run with Docker Compose:**
 ```bash
-# Build all services
-docker-compose build
+# Deploy with Docker
+./deploy.sh localhost docker
 
-# Start all services
+# Or with a domain
+./deploy.sh yourdomain.com docker
+```
+
+Using Docker Compose:
+```bash
+# Build and start all services
 docker-compose up -d
 
 # Check logs
 docker-compose logs -f
 ```
 
-2. **For production with Docker:**
+#### Option 3: Platform-Specific Deployments
+
+**Vercel:**
 ```bash
-# Build images
-docker build -t retell-backend ./server
-docker build -t retell-frontend .
+# Deploy frontend to Vercel
+vercel
 
-# Run with environment variables
-docker run -d \
-  --name retell-backend \
-  -p 3001:3001 \
-  --env-file .env \
-  retell-backend
-
-docker run -d \
-  --name retell-frontend \
-  -p 80:80 \
-  retell-frontend
+# Set environment variable for API endpoint
+VITE_API_URL=https://your-backend.herokuapp.com
 ```
 
-**Docker Features:**
-- ✅ Multi-stage builds for smaller images
-- ✅ Health checks for container monitoring
-- ✅ Non-root user for security
-- ✅ Signal handling with dumb-init
-- ✅ Network isolation
-- ✅ Volume mounting for persistence
-
-#### Option 3: Node.js Hosting Platforms
-
-**Heroku:**
+**Heroku (Backend):**
 ```bash
-# Backend deployment
 cd server
-heroku create your-app-backend
+heroku create your-app-name
 heroku config:set RETELL_API_KEY=your_key_here
 git push heroku main
-
-# Frontend - use static site hosting
 ```
 
 **Railway/Render:**
-```bash
-# Connect GitHub repo
-# Set environment variables in dashboard
-# Deploy automatically on push
-```
+- Connect GitHub repository
+- Set environment variables in dashboard
+- Deploy automatically on push
 
-#### Option 4: Serverless Deployment
+### 🛠️ Script Reference
 
-**Vercel (Frontend + API Routes):**
-```javascript
-// api/create-web-call.js
-export default async function handler(req, res) {
-  // Proxy logic here
-}
-```
+All scripts accept domains as parameters - no modification needed!
 
-**AWS Lambda:**
-```bash
-# Use Serverless Framework
-serverless deploy
-```
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `deploy.sh` | Complete deployment | `./deploy.sh yourdomain.com [nginx\|docker] [email]` |
+| `nginx-setup-fixed.sh` | Nginx configuration | `./nginx-setup-fixed.sh yourdomain.com [backend_port] [frontend_port]` |
+| `enable-ssl.sh` | Enable HTTPS | `./enable-ssl.sh yourdomain.com [backend_port]` |
+| `quick-fix.sh` | Fix SSL issues | `./quick-fix.sh yourdomain.com` |
+| `systemd-setup.sh` | Backend service | `./systemd-setup.sh` |
 
 ### 🔐 Production Security Checklist
 
@@ -219,37 +183,26 @@ serverless deploy
 
 - [ ] **Update CORS Origins**
   ```javascript
-  // server/server.js
-  const allowedOrigins = [
+  // server/server.js - automatically uses ALLOWED_ORIGINS from .env
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
     'https://yourdomain.com',
     'https://app.yourdomain.com'
   ];
   ```
 
-- [ ] **Enable SSL/TLS**
-  - Use Let's Encrypt for free certificates
-  - Enable HSTS headers
-  - Redirect HTTP to HTTPS
+- [ ] **SSL/TLS Configuration**
+  - Automatic with deployment scripts
+  - Uses Let's Encrypt for free certificates
+  - Auto-renewal configured via cron
 
-- [ ] **Configure Rate Limiting**
-  ```javascript
-  // Adjust based on your needs
-  const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 20 // limit each IP to 20 requests
-  });
-  ```
+- [ ] **Rate Limiting**
+  - Pre-configured in Nginx (10 req/s for API)
+  - Adjustable in nginx configuration
 
-- [ ] **Set Up Monitoring**
-  - Application logs
-  - Error tracking (Sentry)
-  - Uptime monitoring
-  - Performance metrics
-
-- [ ] **Regular Updates**
-  - Keep dependencies updated
-  - Security patches
-  - API key rotation
+- [ ] **Monitoring Setup**
+  - Application logs: `sudo journalctl -u retell-backend -f`
+  - Nginx logs: `sudo tail -f /var/log/nginx/yourdomain-*.log`
+  - Health endpoint: `https://yourdomain.com/health`
 
 ### 📊 Architecture
 
@@ -257,57 +210,36 @@ serverless deploy
 ┌─────────────────────────────────────────────────────────────┐
 │                         Internet                            │
 └─────────────────┬───────────────────────────────────────────┘
-                  │ HTTPS
+                  │ HTTPS (Port 443)
 ┌─────────────────▼───────────────────────────────────────────┐
-│              Nginx Reverse Proxy (Port 80/443)              │
-│  • SSL Termination  • Rate Limiting  • Load Balancing       │
+│              Nginx Reverse Proxy                            │
+│  • SSL Termination  • Rate Limiting  • Security Headers     │
 └────────┬──────────────────────────────────┬─────────────────┘
-         │                                  │
-         │ /api/*                           │ /*
-         │                                  │
+         │ /api/* (proxy)                   │ /* (static)
 ┌────────▼────────────┐           ┌────────▼────────────┐
-│   Backend Server    │           │   Static Files      │
-│    (Port 3001)      │           │   (Nginx/CDN)       │
-│                     │           │                     │
-│  • API Proxy        │           │  • HTML/CSS/JS      │
-│  • Auth Token       │           │  • Assets           │
-│  • Rate Limiting    │           │  • Widget Code      │
+│   Backend Server    │           │   Frontend Files    │
+│    (Port 3001)      │           │   (/var/www/...)    │
+│  • API Proxy        │           │  • React App        │
+│  • Authentication   │           │  • Widget Code      │
 └────────┬────────────┘           └─────────────────────┘
-         │
          │ HTTPS + API Key
-         │
 ┌────────▼────────────┐
 │    Retell AI API    │
-│   (External Service) │
 └─────────────────────┘
 ```
 
-### 🛠️ Configuration
+### 🎨 Widget Configuration
 
-#### Widget Configuration
+Embed the widget in your website:
 
 ```javascript
-// Embed in your website
+// Basic embedding
 new RetellWidget({
   agentId: 'your_agent_id',
   proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
   position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
   theme: 'purple' // or 'blue', 'green'
 });
-```
-
-#### Server Configuration
-
-```javascript
-// server/server.js
-const config = {
-  port: process.env.PORT || 3001,
-  corsOrigins: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'],
-  rateLimit: {
-    windowMs: 60000,
-    max: 20
-  }
-};
 ```
 
 ### 🔍 Testing & Monitoring
@@ -321,128 +253,112 @@ curl https://yourdomain.com/api/health
 # Check frontend
 curl https://yourdomain.com/
 
-# Check Nginx status
-sudo nginx -t
-sudo systemctl status nginx
+# Check SSL certificate
+curl -vI https://yourdomain.com
 ```
 
-#### Load Testing
+#### Monitor Services
 
 ```bash
-# Install Apache Bench
-sudo apt-get install apache2-utils
+# Backend logs (systemd)
+sudo journalctl -u retell-backend -f
 
-# Test API endpoint
-ab -n 1000 -c 10 https://yourdomain.com/api/health
+# Nginx access logs
+sudo tail -f /var/log/nginx/yourdomain-access.log
+
+# Nginx error logs
+sudo tail -f /var/log/nginx/yourdomain-error.log
 ```
-
-#### Monitoring Commands
-
-```bash
-# View backend logs (systemd)
-sudo journalctl -u retell-widget-backend -f
-
-# View Nginx access logs
-sudo tail -f /var/log/nginx/retell-widget-access.log
-
-# View Nginx error logs
-sudo tail -f /var/log/nginx/retell-widget-error.log
-
-# Check system resources
-htop
-```
-
-### 📈 Performance Optimization
-
-1. **Enable Caching:**
-   - Static assets: 30 days
-   - API responses: Based on content type
-   - CDN integration for global distribution
-
-2. **Compression:**
-   - Gzip enabled for text content
-   - Brotli compression for modern browsers
-
-3. **Connection Pooling:**
-   - Keep-alive connections
-   - HTTP/2 enabled
-
-4. **Resource Optimization:**
-   - Minified JavaScript and CSS
-   - Optimized images
-   - Lazy loading for non-critical resources
 
 ### 🚨 Troubleshooting
 
-#### Common Issues
+#### Quick Fixes
 
-**Backend won't start:**
 ```bash
-# Check logs
-sudo journalctl -u retell-widget-backend -n 50
+# SSL configuration issues
+sudo ./quick-fix.sh yourdomain.com
 
-# Verify .env file
-cat .env
-
-# Check port availability
-sudo lsof -i :3001
-```
-
-**Nginx errors:**
-```bash
-# Test configuration
+# Test Nginx configuration
 sudo nginx -t
 
-# Reload after changes
-sudo systemctl reload nginx
-
-# Check error logs
-sudo tail -f /var/log/nginx/error.log
+# Restart services
+sudo systemctl restart nginx
+sudo systemctl restart retell-backend
 ```
 
-**CORS issues:**
-```javascript
-// Ensure your domain is in allowedOrigins
-const allowedOrigins = [
-  'https://yourdomain.com' // Add your domain here
-];
-```
+#### Common Issues
 
-**SSL certificate issues:**
-```bash
-# Renew certificate
-sudo certbot renew
+| Issue | Solution |
+|-------|----------|
+| SSL certificate error | Run `sudo ./quick-fix.sh yourdomain.com` then follow instructions |
+| Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-backend -n 50` |
+| CORS errors | Update `ALLOWED_ORIGINS` in `.env` file |
+| Port already in use | Find process: `sudo lsof -i :3001` and kill it |
 
-# Force renewal
-sudo certbot renew --force-renewal
-```
+### 📈 Performance Optimization
 
-### 📝 Maintenance
+The deployment scripts automatically configure:
 
-#### Regular Tasks
+- **Gzip Compression** - Reduces bandwidth by 70%
+- **Static Asset Caching** - 30-day cache for images/CSS/JS
+- **HTTP/2** - Multiplexed connections for faster loading
+- **Keep-Alive** - Persistent connections
+- **Rate Limiting** - Prevents abuse and DDoS
 
-- **Weekly:** Check logs for errors
-- **Monthly:** Update dependencies
-- **Quarterly:** Rotate API keys
-- **Yearly:** Renew SSL certificates (auto-renewal recommended)
-
-#### Backup Strategy
+### 🔄 Updating Your Deployment
 
 ```bash
-# Backup configuration
-tar -czf backup-$(date +%Y%m%d).tar.gz .env server/ nginx/
+# Pull latest changes
+git pull
 
-# Backup to remote location
-rsync -avz backup-*.tar.gz user@backup-server:/backups/
+# Rebuild application
+npm run build
+
+# Deploy updates
+sudo cp -r dist/* /var/www/retell-widget/dist/
+
+# Restart backend if needed
+sudo systemctl restart retell-backend
 ```
 
-### 🤝 Support
+### 🌍 Multiple Domain Support
 
-For issues or questions:
-1. Check the troubleshooting section
-2. Review server logs
-3. Open an issue on GitHub
-4. Contact support with error logs
+Deploy to multiple domains easily:
+
+```bash
+# Deploy to first domain
+sudo ./deploy.sh domain1.com nginx admin@domain1.com
+
+# Deploy to second domain
+sudo ./deploy.sh domain2.com nginx admin@domain2.com
+```
+
+Each domain gets its own:
+- Nginx configuration
+- SSL certificate
+- Log files
+- Monitoring
+
+### 📝 Environment Variables
+
+Complete list of supported environment variables:
+
+```bash
+# Required
+RETELL_API_KEY=your_retell_api_key
+
+# Optional
+PORT=3001                    # Backend server port
+NODE_ENV=production          # Environment (development/production)
+ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
+```
+
+### 🤝 Support & Documentation
+
+- **Detailed Deployment Guide:** See [README-DEPLOYMENT.md](./README-DEPLOYMENT.md)
+- **Script Documentation:** Each script has `--help` option
+- **Logs Location:** `/var/log/nginx/` and `journalctl`
+- **Configuration Files:** `/etc/nginx/sites-available/retell-widget`
 
 ### 📄 License
 
@@ -450,9 +366,11 @@ MIT License - Use freely in your projects!
 
 ---
 
-**Remember:** 
-- Never expose API keys in client-side code
-- Always use HTTPS in production
-- Keep your dependencies updated
-- Monitor your application logs
-- Set up proper backups
+**Key Features:**
+- 🎯 **Domain-agnostic** - Works with ANY domain
+- 🔒 **Secure by default** - No API keys in client code
+- 🚀 **One-command deployment** - Production-ready in minutes
+- 📦 **Multiple deployment options** - Nginx, Docker, or manual
+- 🛡️ **Enterprise-grade security** - SSL, CORS, rate limiting
+- 📊 **Production monitoring** - Health checks and logging
+- 🔄 **Easy updates** - Simple upgrade process
