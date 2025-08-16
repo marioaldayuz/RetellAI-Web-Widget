@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetellAI Widget Integration Example</title>
+    
+    <!-- Include widget CSS -->
+    <link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+    
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            background: #f0f2f5; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .code { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 RetellAI Widget Integration Example</h1>
+        <p>This page demonstrates how to integrate the RetellAI widget on any website.</p>
+        
+        <h2>📋 Integration Steps:</h2>
+        <ol>
+            <li>Include the widget CSS and JS files</li>
+            <li>Initialize the widget with your configuration</li>
+            <li>Look for the widget in the bottom-right corner!</li>
+        </ol>
+        
+        <h2>💻 Code Used:</h2>
+        <div class="code"><!-- Include widget files -->
+&lt;link rel="stylesheet" href="https://your-cdn.com/retell-widget.css"&gt;
+&lt;script src="https://your-cdn.com/retell-widget.js"&gt;&lt;/script&gt;
+
+&lt;!-- Initialize widget --&gt;
+&lt;script&gt;
+  new RetellWidget({
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+    position: 'bottom-right',
+    theme: 'purple'
+  });
+&lt;/script&gt;</div>
+        
+        <p><strong>Note:</strong> Update the URLs and agentId with your actual values.</p>
+    </div>
+    
+    <!-- Include widget JS -->
+    <script src="https://your-cdn.com/retell-widget.js"></script>
+    
+    <!-- Initialize widget -->
+    <script>
+        new RetellWidget({
+            agentId: 'demo_agent_12345', // Replace with your agent ID
+            proxyEndpoint: 'https://your-backend.com/api/create-web-call', // Replace with your backend URL
+            position: 'bottom-right',
+            theme: 'purple'
+        });
+    </script>
+</body>
+</html>

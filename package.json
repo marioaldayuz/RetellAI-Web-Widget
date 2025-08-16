@@ -1,22 +1,47 @@
 {
   "name": "retellai-embeddable-widget",
-  "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "Universal AI voice assistant widget powered by Retell AI - embeddable on any website",
+  "keywords": [
+    "retell",
+    "ai",
+    "voice",
+    "assistant",
+    "widget",
+    "embeddable",
+    "universal"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/RetellAI-Web-Widget.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup": "npm run setup:frontend && npm run setup:backend",
+    "setup:frontend": "npm install",
+    "setup:backend": "cd server && npm install",
+    "start:dev": "concurrently \"npm run dev\" \"npm run server:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "server:start": "cd server && npm start",
+    "build:all": "npm run build",
+    "deploy:prepare": "npm run build:all && npm run deploy:copy-files",
+    "deploy:copy-files": "node scripts/prepare-deployment.js"
   },
   "dependencies": {
     "retell-client-js-sdk": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.2",
-    "tailwindcss": "^3.4.0",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32"
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.2"
   }
 }

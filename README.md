@@ -2,6 +2,14 @@
 
 A beautiful, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment configurations that work with **ANY domain**.
 
+> **🚀 Ready to Clone & Deploy**: This repository is designed for easy cloning and deployment by anyone.
+
+## 🎯 **New Here? Start Here!**
+
+👉 **[GETTING-STARTED.md](./GETTING-STARTED.md)** - Complete one-command setup guide
+
+👉 **[CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md)** - Detailed deployment instructions
+
 ## ⚡ Recent Improvements (v2.1 - Systemd Fix)
 
 **🎉 SYSTEMD DEPLOYMENT ISSUE FIXED!** 
@@ -37,47 +45,46 @@ If you experienced systemd service failures with "Changing to the requested work
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
-
+### 1. Clone and Setup Everything
 ```bash
-# Install frontend dependencies
-npm install
+git clone https://github.com/yourusername/RetellAI-Web-Widget.git
+cd RetellAI-Web-Widget
+npm run setup  # Installs all dependencies and guides environment setup
+```
 
-# Install backend dependencies
+### 2. Configure Your API Key
+```bash
 cd server
-npm install
-cd ..
+npm run setup:env  # Interactive environment configuration
 ```
 
-### 2. Configure Environment
+This will ask for:
+- Your Retell AI API Key
+- Widget access mode (universal/specific domains)
+- Server configuration
 
+### 3. Build and Test
 ```bash
-# Copy the example environment file
-cp .env.example .env
+# Build the widget
+npm run build
 
-# Edit .env and add your Retell API key
-nano .env
+# Start the server
+npm run server:start
+
+# Test everything works
+cd server && npm test
 ```
 
-**Important:** Never commit `.env` to version control!
-
-### 3. Start Development Servers
-
+### 4. Deploy
 ```bash
-# Terminal 1: Start the proxy server
-cd server
-npm run dev
+# Prepare deployment files
+npm run deploy:prepare
 
-# Terminal 2: Start the frontend
-npm run dev
+# Upload deployment/widget/* to your CDN
+# Deploy deployment/server/* to your hosting service
 ```
 
-### 4. Test the Widget
-
-1. Open http://localhost:5173 in your browser
-2. The widget appears in the bottom-right corner
-3. Click "Start Call" to initiate a voice conversation
-4. No API keys are exposed in the browser!
+**That's it!** Your widget is now ready to be embedded on any website.
 
 ## 📦 Production Deployment
 
@@ -477,13 +484,20 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ### 🤝 Support & Documentation
 
-- **🌍 Universal Widget Deployment:** See [universal-widget-deployment.md](./universal-widget-deployment.md)
-- **🌐 Cross-Domain Deployment:** See [cross-domain-deployment-guide.md](./cross-domain-deployment-guide.md)
-- **📋 Deployment Checklist:** See [deployment-checklist.md](./deployment-checklist.md)
-- **🎯 Widget Integration:** See [widget-usage-guide.md](./widget-usage-guide.md)
-- **🔧 Systemd Fix:** See [systemd-fix.sh](./systemd-fix.sh) for immediate fixes
-- **📖 Comprehensive Guide:** See [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) for fresh server setups
-- **⚡ Quick Deployment:** See [README-DEPLOYMENT.md](./README-DEPLOYMENT.md) for overview
+#### 🚀 **Getting Started**
+- **⚡ Quick Start:** [GETTING-STARTED.md](./GETTING-STARTED.md) - **NEW USERS START HERE**
+- **🔄 Complete Setup:** [CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md) - Detailed instructions
+- **🌍 Universal Deployment:** [universal-widget-deployment.md](./universal-widget-deployment.md)
+- **🎯 Widget Integration:** [widget-usage-guide.md](./widget-usage-guide.md)
+
+#### 📚 **Advanced Deployment**
+- **🌐 Cross-Domain Deployment:** [cross-domain-deployment-guide.md](./cross-domain-deployment-guide.md)
+- **📋 Deployment Checklist:** [deployment-checklist.md](./deployment-checklist.md)
+- **🔧 Systemd Fix:** [systemd-fix.sh](./systemd-fix.sh) for immediate fixes
+- **📖 Comprehensive Guide:** [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) for fresh server setups
+- **⚡ Quick Deployment:** [README-DEPLOYMENT.md](./README-DEPLOYMENT.md) for overview
+
+#### 🛠️ **Technical Reference**
 - **🛠️ Script Documentation:** Each script has `--help` option
 - **📋 Logs Location:** `/var/log/nginx/` and `journalctl -u retell-widget-backend`
 - **⚙️ Configuration Files:** `/etc/nginx/sites-available/retell-widget`
