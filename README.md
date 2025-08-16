@@ -275,16 +275,56 @@ sudo ./nginx-setup-fixed.sh api.example.com --www # force www
 
 ### 🎨 Widget Configuration
 
-Embed the widget in your website:
+#### Method 1: Include Built Files (Recommended)
 
-```javascript
-// Basic embedding
-new RetellWidget({
-  agentId: 'your_agent_id',
-  proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
-  position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
-  theme: 'purple' // or 'blue', 'green'
-});
+1. **Build the widget:**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+2. **Include the generated files in your HTML:**
+   ```html
+   <!-- Include CSS and JS -->
+   <link rel="stylesheet" href="./dist/retell-widget.css">
+   <script src="./dist/retell-widget.js"></script>
+   
+   <!-- Initialize the widget -->
+   <script>
+     const widget = new RetellWidget({
+       agentId: 'your_agent_id',
+       proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+       position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
+       theme: 'purple' // or 'blue', 'green'
+     });
+   </script>
+   ```
+
+#### Method 2: Auto-initialization
+
+```html
+<!-- Set config before loading script -->
+<script>
+  window.retellWidgetConfig = {
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+    position: 'bottom-right',
+    theme: 'purple'
+  };
+</script>
+<link rel="stylesheet" href="./dist/retell-widget.css">
+<script src="./dist/retell-widget.js"></script>
+```
+
+#### Configuration Options
+
+```typescript
+interface WidgetConfig {
+  agentId: string;                    // Required: Your Retell AI agent ID
+  proxyEndpoint?: string;             // Optional: Backend endpoint (default: localhost:3001)
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  theme?: 'purple' | 'blue' | 'green';
+}
 ```
 
 ### 🔍 Testing & Monitoring

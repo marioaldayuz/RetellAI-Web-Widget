@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetellAI Widget Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .code-block {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #334155;
+            overflow-x: auto;
+        }
+        .demo-controls {
+            margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .demo-button {
+            background: linear-gradient(135deg, #9333ea, #a855f7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .demo-button:hover {
+            transform: scale(1.05);
+        }
+        .demo-button.blue {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+        .demo-button.green {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+        .note {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+    <!-- Include the RetellAI Widget CSS and JS -->
+    <link rel="stylesheet" href="./dist/retell-widget.css">
+    <script src="./dist/retell-widget.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">RetellAI Widget Integration Example</h1>
+        
+        <div class="note">
+            <strong>🎉 Widget Ready!</strong> Look for the AI assistant widget in the bottom-right corner.
+            You can interact with it to start a voice conversation.
+        </div>
+
+        <h2>📝 How to integrate:</h2>
+        <div class="code-block">
+&lt;!-- 1. Include the CSS and JS files --&gt;
+&lt;link rel="stylesheet" href="./dist/retell-widget.css"&gt;
+&lt;script src="./dist/retell-widget.js"&gt;&lt;/script&gt;
+
+&lt;!-- 2. Initialize the widget --&gt;
+&lt;script&gt;
+  // Create the widget
+  const widget = new RetellWidget({
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://yourdomain.com/api/create-web-call',
+    position: 'bottom-right',
+    theme: 'purple'
+  });
+&lt;/script&gt;
+        </div>
+
+        <h2>🎮 Try different configurations:</h2>
+        <div class="demo-controls">
+            <button class="demo-button" onclick="createWidget('bottom-right', 'purple')">Bottom Right - Purple</button>
+            <button class="demo-button" onclick="createWidget('bottom-left', 'blue')">Bottom Left - Blue</button>
+            <button class="demo-button" onclick="createWidget('top-right', 'green')">Top Right - Green</button>
+            <button class="demo-button" onclick="createWidget('top-left', 'purple')">Top Left - Purple</button>
+        </div>
+
+        <div class="demo-controls">
+            <button class="demo-button blue" onclick="toggleWidget()">Toggle Widget</button>
+            <button class="demo-button green" onclick="destroyWidget()">Remove Widget</button>
+        </div>
+
+        <h2>⚙️ Configuration Options:</h2>
+        <div class="code-block">
+{
+  agentId: 'your_agent_id',           // Required: Your Retell AI agent ID
+  proxyEndpoint: '/api/create-web-call', // Required: Your backend endpoint
+  position: 'bottom-right',           // Optional: Widget position
+  theme: 'purple'                     // Optional: Color theme
+}
+
+// Available positions: 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+// Available themes: 'purple', 'blue', 'green'
+        </div>
+
+        <div class="note">
+            <strong>🔧 Backend Required:</strong> Make sure your backend implements the 
+            <code>/api/create-web-call</code> endpoint that returns an access token.
+            Check the server directory for implementation details.
+        </div>
+    </div>
+
+    <script>
+        let currentWidget = null;
+
+        // Initialize the widget on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createWidget('bottom-right', 'purple');
+        });
+
+        function createWidget(position, theme) {
+            // Destroy existing widget
+            if (currentWidget) {
+                currentWidget.destroy();
+            }
+
+            // Create new widget
+            currentWidget = new RetellWidget({
+                agentId: 'agent_123456789', // Replace with your actual agent ID
+                proxyEndpoint: 'http://localhost:3001/api/create-web-call', // Update with your endpoint
+                position: position,
+                theme: theme
+            });
+
+            console.log(`Created widget at ${position} with ${theme} theme`);
+        }
+
+        function toggleWidget() {
+            if (currentWidget) {
+                if (currentWidget.container && currentWidget.container.style.display === 'none') {
+                    currentWidget.show();
+                } else {
+                    currentWidget.minimize();
+                }
+            }
+        }
+
+        function destroyWidget() {
+            if (currentWidget) {
+                currentWidget.destroy();
+                currentWidget = null;
+                console.log('Widget destroyed');
+            }
+        }
+
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Error:', e.error);
+        });
+    </script>
+</body>
+</html>

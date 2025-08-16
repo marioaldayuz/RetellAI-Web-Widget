@@ -418,11 +418,21 @@ class RetellWidget {
 }
 
 // Make RetellWidget available globally
-(window as any).RetellWidget = RetellWidget;
+declare global {
+  interface Window {
+    RetellWidget: typeof RetellWidget;
+    retellWidgetConfig?: WidgetConfig;
+  }
+}
 
-// Auto-initialize if config is available
-if ((window as any).retellWidgetConfig) {
-  new RetellWidget((window as any).retellWidgetConfig);
+// Expose RetellWidget globally
+if (typeof window !== 'undefined') {
+  window.RetellWidget = RetellWidget;
+  
+  // Auto-initialize if config is available
+  if (window.retellWidgetConfig) {
+    new RetellWidget(window.retellWidgetConfig);
+  }
 }
 
 export default RetellWidget;
