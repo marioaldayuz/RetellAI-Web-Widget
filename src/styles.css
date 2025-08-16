@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom widget styles */
+.retell-widget {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.retell-widget-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.retell-widget-button:hover {
+  transform: scale(1.05);
+}
+
+.retell-widget-glassmorphism {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.retell-widget-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.retell-widget-speech-bar {
+  animation: speech-wave 1.5s ease-in-out infinite;
+}
+
+.retell-widget-speech-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.retell-widget-speech-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.retell-widget-speech-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes speech-wave {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+.retell-widget-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

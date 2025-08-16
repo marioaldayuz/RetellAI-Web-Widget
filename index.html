@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetellAI Widget Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .demo-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .demo-subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .demo-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .demo-section {
+            margin-bottom: 40px;
+        }
+        .demo-section h2 {
+            color: #a855f7;
+            margin-bottom: 20px;
+        }
+        .demo-code {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            border: 1px solid #334155;
+        }
+        .demo-list {
+            list-style: none;
+            padding: 0;
+        }
+        .demo-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .demo-list li:before {
+            content: "✨";
+            margin-right: 10px;
+        }
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .demo-button {
+            background: linear-gradient(135deg, #9333ea, #a855f7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .demo-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.3);
+        }
+        .demo-button.secondary {
+            background: linear-gradient(135deg, #374151, #4b5563);
+        }
+        .demo-button.blue {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+        .demo-button.green {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+        .demo-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading-message {
+            text-align: center;
+            color: #a855f7;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">RetellAI Widget</h1>
+            <p class="demo-subtitle">
+                Beautiful, embeddable AI voice assistant widget that can be deployed on any website.
+                Look for the widget in the bottom-right corner!
+            </p>
+        </div>
+
+        <div class="demo-content">
+            <div class="demo-section">
+                <h2>🎮 Live Demo Controls</h2>
+                <div id="loading-message" class="loading-message">Loading widget...</div>
+                <div id="demo-controls" style="display: none;">
+                    <div class="demo-controls">
+                        <button id="btn-bottom-right" class="demo-button">Bottom Right</button>
+                        <button id="btn-bottom-left" class="demo-button">Bottom Left</button>
+                        <button id="btn-top-right" class="demo-button">Top Right</button>
+                        <button id="btn-top-left" class="demo-button">Top Left</button>
+                    </div>
+                    <div class="demo-controls">
+                        <button id="btn-theme-purple" class="demo-button">Purple Theme</button>
+                        <button id="btn-theme-blue" class="demo-button blue">Blue Theme</button>
+                        <button id="btn-theme-green" class="demo-button green">Green Theme</button>
+                    </div>
+                    <div class="demo-controls">
+                        <button id="btn-toggle" class="demo-button secondary">Toggle Widget</button>
+                        <button id="btn-reset" class="demo-button secondary">Reset Widget</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>🚀 Quick Setup</h2>
+                <p>Add this script to any website to embed the RetellAI widget:</p>
+                <div class="demo-code">
+<script>
+  window.retellWidgetConfig = {
+    apiKey: 'your-retell-api-key',
+    agentId: 'your-agent-id',
+    position: 'bottom-right',
+    theme: 'purple',
+    apiEndpoint: 'https://your-server.com/api/create-web-call'
+  };
+</script>
+<script src="https://your-cdn.com/retell-widget.js"></script>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>✨ Features</h2>
+                <ul class="demo-list">
+                    <li>One-click call initiation with beautiful animations</li>
+                    <li>Real-time call timer with elegant display</li>
+                    <li>Visual speech indicators when AI is talking</li>
+                    <li>Mute/unmute functionality during calls</li>
+                    <li>Customizable positioning and themes</li>
+                    <li>Cross-domain compatible</li>
+                    <li>No dependencies on host website</li>
+                    <li>Responsive design for all devices</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h2>⚙️ Configuration Options</h2>
+                <div class="demo-code">
+{
+  apiKey: 'your-retell-api-key',        // Your RetellAI API key
+  agentId: 'your-agent-id',             // Your RetellAI agent ID
+  position: 'bottom-right',             // bottom-right, bottom-left, top-right, top-left
+  theme: 'purple',                      // purple, blue, green
+  apiEndpoint: '/api/create-web-call'   // Your backend endpoint
+}
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>🔧 Backend Integration</h2>
+                <p>Your backend needs to implement the web call creation endpoint:</p>
+                <div class="demo-code">
+// POST /api/create-web-call
+{
+  "agent_id": "your-agent-id"
+}
+
+// Response:
+{
+  "access_token": "web-call-access-token"
+}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load demo application -->
+    <script type="module" src="/src/demo.ts"></script>
+</body>
+</html>
