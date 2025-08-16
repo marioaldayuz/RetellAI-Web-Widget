@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Retell AI Widget - Complete Deployment Script
-# This script handles the full deployment process
+# Domain Agnostic Version
 
 set -e
 
@@ -12,13 +12,44 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Configuration
+# Configuration from command line
 DOMAIN=${1:-""}
 DEPLOY_TYPE=${2:-"nginx"} # nginx, docker, or manual
+EMAIL=${3:-""}
+
+# Function to display usage
+show_usage() {
+    echo "Usage: $0 <domain> [deploy_type] [email]"
+    echo ""
+    echo "Arguments:"
+    echo "  domain       - Your domain name (required for nginx deployment)"
+    echo "  deploy_type  - Deployment type: nginx, docker, or manual (default: nginx)"
+    echo "  email        - Email for SSL certificate (optional)"
+    echo ""
+    echo "Examples:"
+    echo "  $0 example.com"
+    echo "  $0 example.com nginx admin@example.com"
+    echo "  $0 localhost docker"
+    echo ""
+}
 
 echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   Retell AI Widget Deployment Script   ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
+echo ""
+
+# Validate inputs based on deployment type
+if [ "$DEPLOY_TYPE" == "nginx" ] && [ -z "$DOMAIN" ]; then
+    echo -e "${RED}Error: Domain name is required for nginx deployment!${NC}"
+    echo ""
+    show_usage
+    exit 1
+fi
+
+if [ -n "$DOMAIN" ]; then
+    echo -e "${BLUE}Domain: $DOMAIN${NC}"
+fi
+echo -e "${BLUE}Deployment Type: $DEPLOY_TYPE${NC}"
 echo ""
 
 # Function to check prerequisites
@@ -45,6 +76,15 @@ check_prerequisites() {
     if [ ! -f .env ]; then
         echo -e "${RED}✗ .env file not found${NC}"
         echo "Please create a .env file with your RETELL_API_KEY"
+        echo ""
+        echo "Creating .env from template..."
+        if [ -f .env.example ]; then
+            cp .env.example .env
+            echo -e "${YELLOW}Created .env from .env.example - Please add your RETELL_API_KEY${NC}"
+        else
+            echo "RETELL_API_KEY=your_key_here" > .env
+            echo -e "${YELLOW}Created basic .env - Please add your RETELL_API_KEY${NC}"
+        fi
         exit 1
     else
         echo -e "${GREEN}✓ .env file found${NC}"
@@ -75,19 +115,18 @@ build_project() {
 # Function to deploy with Nginx
 deploy_nginx() {
     echo ""
-    echo -e "${YELLOW}Deploying with Nginx...${NC}"
+    echo -e "${YELLOW}Deploying with Nginx for $DOMAIN...${NC}"
     
-    if [ -z "$DOMAIN" ]; then
-        echo -e "${RED}Domain name required for Nginx deployment${NC}"
-        echo "Usage: ./deploy.sh yourdomain.com nginx"
-        exit 1
-    fi
+    # Make scripts executable
+    chmod +x nginx-setup-fixed.sh enable-ssl.sh systemd-setup.sh
     
     # Run Nginx setup
-    sudo ./nginx-setup.sh $DOMAIN
+    sudo ./nginx-setup-fixed.sh $DOMAIN
     
     # Setup systemd service
-    sudo ./systemd-setup.sh
+    if [ -f systemd-setup.sh ]; then
+        sudo ./systemd-setup.sh
+    fi
     
     # Copy built files
     echo "Copying built files to web root..."
@@ -96,8 +135,17 @@ deploy_nginx() {
     
     # Setup SSL
     echo ""
-    echo -e "${YELLOW}Setting up SSL certificate...${NC}"
-    sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN
+    echo -e "${YELLOW}Setting up SSL certificate for $DOMAIN...${NC}"
+    
+    if [ -n "$EMAIL" ]; then
+        sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email $EMAIL
+    else
+        echo -e "${YELLOW}No email provided. Certbot will prompt for email.${NC}"
+        sudo certbot certonly --webroot -w /var/www/certbot -d $DOMAIN -d www.$DOMAIN
+    fi
+    
+    # Enable SSL
+    sudo ./enable-ssl.sh $DOMAIN
     
     echo -e "${GREEN}✓ Nginx deployment complete${NC}"
 }
@@ -110,7 +158,15 @@ deploy_docker() {
     # Check Docker
     if ! command -v docker &> /dev/null; then
         echo -e "${RED}Docker is not installed${NC}"
+        echo "Please install Docker first: https://docs.docker.com/get-docker/"
         exit 1
+    fi
+    
+    # Check docker-compose
+    if ! command -v docker-compose &> /dev/null; then
+        echo -e "${YELLOW}Installing docker-compose...${NC}"
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
     fi
     
     # Build and start containers
@@ -137,6 +193,12 @@ deploy_manual() {
     echo "   - Route /api/* to backend server (port 3001)"
     echo "   - Serve static files from dist/"
     echo ""
+    if [ -n "$DOMAIN" ]; then
+        echo "4. Configure SSL for $DOMAIN"
+        echo "   - Use Let's Encrypt or your SSL provider"
+        echo "   - Point domain to your server IP"
+    fi
+    echo ""
     echo -e "${GREEN}Build complete. Files ready in dist/ directory${NC}"
 }
 
@@ -158,6 +220,7 @@ main() {
         *)
             echo -e "${RED}Invalid deployment type: $DEPLOY_TYPE${NC}"
             echo "Valid options: nginx, docker, manual"
+            show_usage
             exit 1
             ;;
     esac
@@ -170,17 +233,28 @@ main() {
     
     if [ "$DEPLOY_TYPE" == "nginx" ]; then
         echo "Your widget is now available at:"
-        echo -e "${BLUE}https://$DOMAIN${NC}"
+        echo -e "${BLUE}🔒 https://$DOMAIN${NC}"
+        echo -e "${BLUE}🔒 https://www.$DOMAIN${NC}"
     elif [ "$DEPLOY_TYPE" == "docker" ]; then
         echo "Your widget is now available at:"
         echo -e "${BLUE}http://localhost${NC}"
+        if [ -n "$DOMAIN" ]; then
+            echo -e "${BLUE}Configure your domain $DOMAIN to point to this server${NC}"
+        fi
     fi
     
     echo ""
-    echo "Next steps:"
+    echo -e "${YELLOW}Next steps:${NC}"
     echo "1. Test the widget by visiting your site"
-    echo "2. Monitor logs for any issues"
+    echo "2. Monitor logs for any issues:"
+    if [ "$DEPLOY_TYPE" == "nginx" ]; then
+        echo "   • Nginx: sudo tail -f /var/log/nginx/${DOMAIN}-*.log"
+        echo "   • Backend: sudo journalctl -u retell-backend -f"
+    elif [ "$DEPLOY_TYPE" == "docker" ]; then
+        echo "   • Docker: docker-compose logs -f"
+    fi
     echo "3. Set up monitoring and backups"
+    echo "4. Configure firewall rules if needed"
 }
 
 # Run main function
