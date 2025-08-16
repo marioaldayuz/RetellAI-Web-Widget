@@ -4,6 +4,23 @@
 
 This guide provides domain-agnostic deployment scripts that work with ANY domain.
 
+## ⚡ Recent Improvements (Systemd Fix)
+
+**IMPORTANT**: If you experienced systemd service failures with "Changing to the requested working directory failed" errors, these have been **FIXED**! 
+
+### What was fixed:
+- ✅ **Absolute path detection** in systemd-setup.sh
+- ✅ **Pre-flight validation** of directories and files
+- ✅ **Better error messages** with detailed troubleshooting info
+- ✅ **Dependency checking** before service creation
+
+### Updated files:
+- `systemd-setup.sh` - Now uses absolute paths and validates everything before creating service
+- `systemd-fix.sh` - Emergency fix script for existing deployments
+- `DEPLOYMENT-GUIDE.md` - Comprehensive guide for fresh server deployments
+
+For detailed troubleshooting and fresh server setup, see [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md).
+
 ## 📋 Prerequisites
 
 - Ubuntu/Debian server (tested on Ubuntu 24.04)
