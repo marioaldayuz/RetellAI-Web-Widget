@@ -1,9 +1,26 @@
-# Retell AI Web Widget
+# RetellAI Web Widget - Beautiful Voice AI Assistant for Any Website
 
-A secure, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment.
+**Transform your website with conversational AI in minutes.** Beautiful Intercom-style voice widget with customizable design, real-time speech, and simple integration.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
+![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.0.0-blue.svg)
+![Production Ready](https://img.shields.io/badge/production-ready-green.svg)
+
+## ✨ Overview
+
+RetellAI Web Widget is a production-ready, embeddable voice assistant that transforms any website into an interactive voice-enabled experience. Built with TypeScript and modern web technologies, this open-source widget provides a beautiful Intercom-style interface for RetellAI's powerful conversational AI platform.
+
+### 🎯 Key Features
+
+- 🎨 **Fully Customizable Design** - Match your brand with custom colors, Font Awesome icons, welcome messages, and button labels
+- 🎯 **Intercom-Style Interface** - Familiar floating bubble design that users love, expanding into a beautiful chat window
+- 🎵 **Real-Time Voice Interaction** - Seamless WebRTC-powered voice conversations with visual sound wave feedback
+- 🚀 **One-Touch Deployment** - Deploy to production in minutes with automated SSL, NGINX configuration, and systemd service setup
+- 🔒 **Secure Proxy Server** - Built-in Node.js backend protects your API keys while enabling CORS-compliant integration
+- 📱 **Responsive Design** - Perfect experience on desktop, tablet, and mobile devices
+- ⚡ **Lightweight & Fast** - Optimized bundle size with Vite build system, loads instantly on any website
+- 🛠️ **Developer-Friendly** - Simple JavaScript API, comprehensive documentation, and example implementations
 
 ## 🚀 Quick Start
 
@@ -15,6 +32,121 @@ cd RetellAI-Web-Widget
 chmod +x one-touch-deploy.sh
 ./one-touch-deploy.sh YOUR_RETELL_API_KEY your-domain.com your@email.com
 ```
+
+### Add to Any Website (3 Lines of Code!)
+
+```html
+<!-- Add beautiful voice AI to your website -->
+<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+<script src="https://your-cdn.com/retell-widget.js"></script>
+<script>
+  new RetellWidget({
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://your-backend.com/api/create-web-call'
+  });
+</script>
+```
+
+## 🎨 Customization Examples
+
+### Default Configuration
+Simple setup with purple theme and headset icon:
+
+```javascript
+new RetellWidget({
+  agentId: 'your_agent_id',
+  proxyEndpoint: 'https://your-backend.com/api/create-web-call'
+});
+```
+
+### Custom Brand Colors
+Match your brand identity:
+
+```javascript
+new RetellWidget({
+  agentId: 'your_agent_id',
+  proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+  primaryColor: '#2563eb',      // Your brand color
+  secondaryColor: '#3b82f6',    // Accent color
+  bubbleIcon: 'fa-robot',       // Font Awesome icon
+  position: 'bottom-right'
+});
+```
+
+### Personalized Experience
+Custom messages and labels:
+
+```javascript
+new RetellWidget({
+  agentId: 'your_agent_id',
+  proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+  welcomeMessage: 'Hi! How can I help you today?',
+  buttonLabel: 'Talk to Assistant',
+  primaryColor: '#059669',
+  secondaryColor: '#10b981',
+  bubbleIcon: 'fa-headset',
+  position: 'bottom-left'
+});
+```
+
+### Support Agent Configuration
+Professional customer support setup:
+
+```javascript
+new RetellWidget({
+  agentId: 'your_agent_id',
+  proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+  bubbleIcon: 'fa-phone',
+  welcomeMessage: 'Call our support team',
+  buttonLabel: 'Start Support Call',
+  primaryColor: '#dc2626',
+  secondaryColor: '#ef4444'
+});
+```
+
+## ⚙️ Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `agentId` | string | required | Your RetellAI agent ID |
+| `proxyEndpoint` | string | '/api/create-web-call' | Your backend API endpoint |
+| `primaryColor` | string | '#9333ea' | Primary color (hex) |
+| `secondaryColor` | string | '#a855f7' | Secondary color (hex) |
+| `bubbleIcon` | string | 'fa-headset' | Font Awesome icon class |
+| `welcomeMessage` | string | 'How can I help you today?' | Welcome text above button |
+| `buttonLabel` | string | 'Start Conversation' | Button text label |
+| `position` | string | 'bottom-right' | Widget position ('bottom-right', 'bottom-left', 'top-right', 'top-left') |
+
+### 🎯 Popular Icon Options
+- `fa-headset` - Customer support
+- `fa-robot` - AI assistant
+- `fa-message` - Chat/messaging
+- `fa-comments` - Conversation
+- `fa-microphone` - Voice/audio
+- `fa-phone` - Phone call
+- `fa-user-headset` - Support agent
+- `fa-circle-question` - Help desk
+
+## 📋 Use Cases
+
+- **Customer Support** - Replace traditional chat with voice-powered support agents
+- **Sales Automation** - Qualify leads and answer product questions 24/7
+- **Healthcare** - Patient intake, appointment scheduling, and health screening
+- **E-commerce** - Product recommendations and shopping assistance
+- **Education** - Interactive tutoring and language learning
+- **Real Estate** - Property inquiries and virtual tour scheduling
+- **Financial Services** - Account support and financial advice
+
+## 🔒 Security Features
+
+- **No API keys in client code** - All credentials stored server-side
+- **Proxy server architecture** - Backend handles all API authentication
+- **Rate limiting** - Protection against abuse and attacks
+- **CORS protection** - Configurable allowed origins
+- **Helmet.js** - Additional security headers
+- **SSL/TLS support** - Full HTTPS encryption
+
+## 📦 Production Deployment
 
 ### Manual Setup
 
@@ -45,62 +177,6 @@ chmod +x one-touch-deploy.sh
    # Deploy deployment/server/* to your hosting service
    ```
 
-## 🔒 Security Features
-
-- **No API keys in client code** - All credentials stored server-side
-- **Proxy server architecture** - Backend handles all API authentication
-- **Rate limiting** - Protection against abuse and attacks
-- **CORS protection** - Configurable allowed origins
-- **Helmet.js** - Additional security headers
-- **SSL/TLS support** - Full HTTPS encryption
-
-## 🎨 Widget Integration
-
-### Method 1: Built Files (Recommended)
-
-```html
-<!-- Include CSS and JS -->
-<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
-<script src="https://your-cdn.com/retell-widget.js"></script>
-
-<!-- Initialize widget -->
-<script>
-  const widget = new RetellWidget({
-    agentId: 'your_agent_id',
-    proxyEndpoint: 'https://your-backend.com/api/create-web-call',
-    position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
-    theme: 'purple' // or 'blue', 'green'
-  });
-</script>
-```
-
-### Method 2: Auto-initialization
-
-```html
-<script>
-  window.retellWidgetConfig = {
-    agentId: 'your_agent_id',
-    proxyEndpoint: 'https://your-backend.com/api/create-web-call',
-    position: 'bottom-right',
-    theme: 'purple'
-  };
-</script>
-<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
-<script src="https://your-cdn.com/retell-widget.js"></script>
-```
-
-## 📦 Production Deployment
-
-### Nginx Deployment (Recommended)
-
-```bash
-# Make scripts executable
-chmod +x *.sh
-
-# Deploy to your domain
-sudo ./one-touch-deploy.sh YOUR_RETELL_API_KEY yourdomain.com admin@yourdomain.com
-```
-
 ### Docker Deployment
 
 ```bash
@@ -127,15 +203,15 @@ heroku config:set RETELL_API_KEY=your_key_here
 git push heroku main
 ```
 
-## 🌐 Configuration
+## 🌐 Environment Configuration
 
-### Environment Variables
-
+### Required Variables
 ```bash
-# Required
 RETELL_API_KEY=your_retell_api_key
+```
 
-# Optional
+### Optional Variables
+```bash
 PORT=3001                    # Backend server port
 NODE_ENV=production         # Environment mode
 ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
@@ -211,6 +287,8 @@ sudo tail -f /var/log/nginx/yourdomain-error.log
 | Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-backend -n 50` |
 | CORS errors | Update `ALLOWED_ORIGINS` in `.env` file |
 | Port already in use | Find process: `sudo lsof -i :3001` and kill it |
+| Widget not appearing | Check browser console for errors, verify script URLs |
+| Voice not working | Ensure HTTPS is enabled and microphone permissions granted |
 
 ## 🔄 Updating
 
@@ -232,6 +310,8 @@ sudo systemctl restart retell-backend
 
 - [Integration Example](deployment/integration-example.html) - Complete HTML example
 - [Server Documentation](server/README.md) - Backend setup details
+- [Widget Demo](example.html) - Interactive demonstration
+- [Test Suite](test-widget.html) - Multiple configuration examples
 
 ## 🛠️ Development
 
@@ -260,10 +340,20 @@ npm run server:test    # Test backend API
 npm run deploy:prepare # Prepare deployment files
 ```
 
-## 🤝 Support
+### Technical Specifications
+
+- **Frontend**: TypeScript, Vite, Tailwind CSS, Retell Web SDK
+- **Backend**: Node.js, Express.js, CORS-enabled API proxy
+- **Deployment**: Docker support, NGINX reverse proxy, SSL/TLS ready
+- **Integration**: Simple script tag embedding, CDN-ready distribution
+- **Browser Support**: Chrome, Firefox, Safari, Edge (all modern browsers)
+- **Dependencies**: Minimal - only RetellAI SDK required
+
+## 🤝 Support & Community
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/RetellAI-Web-Widget/issues)
 - **Documentation**: Check the `/deployment` folder for integration examples
+- **License**: MIT License - See [LICENSE.md](LICENSE.md) for details
 
 ## 👨‍💼 About the Developer
 
@@ -283,9 +373,9 @@ If you are serious about scaling your business and ready for value packed coachi
 
 [![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=c28f896d5736&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
 
-## 📄 License
+## 🏷️ Keywords
 
-MIT License - See [LICENSE.md](LICENSE.md) for details
+`retell-ai`, `voice-assistant`, `web-widget`, `conversational-ai`, `voice-chat`, `embeddable-widget`, `intercom-style`, `webrtc`, `real-time-voice`, `ai-customer-support`, `voice-enabled-website`, `javascript-widget`, `typescript`, `open-source`, `voice-ai-sdk`, `customer-service-automation`, `chatbot-alternative`, `speech-to-text`, `text-to-speech`, `ai-agent`, `voice-interface`
 
 ---
 
