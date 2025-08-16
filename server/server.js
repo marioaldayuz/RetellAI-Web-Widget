@@ -10,14 +10,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
+// Security middleware - but NO cross-origin policy to avoid conflicts with CORS
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 
-// CORS configuration for universal widget deployment
+// CORS configuration - SINGLE source of truth for CORS headers
 const corsOptions = {
   origin: function (origin, callback) {
     // Always log the origin for debugging
-    console.log(`📍 Request from origin: ${origin || 'no-origin'}`);
+    console.log(`📍 CORS request from origin: ${origin || 'no-origin'}`);
+    
+    // PRIORITY 1: Explicitly allow app.olliebot.ai
+    if (origin === 'https://app.olliebot.ai' || origin === 'https://olliebot.ai' || origin === 'https://www.olliebot.ai') {
+      console.log(`✅ Allowing olliebot.ai domain: ${origin}`);
+      return callback(null, true);
+    }
     
     // Allow requests with no origin (mobile apps, Postman, server-to-server, etc.)
     if (!origin) {
@@ -25,7 +33,7 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    // Check for universal access mode (highest priority)
+    // Check for universal access mode (highest priority after olliebot)
     if (process.env.UNIVERSAL_ACCESS === 'true') {
       console.log(`✅ Universal access enabled: Allowing ${origin}`);
       return callback(null, true);
@@ -199,8 +207,12 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Proxy server running on http://localhost:${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(`🚀 Retell Widget Backend Server`);
+  console.log(`📡 Port: ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'production'}`);
+  console.log(`🔒 CORS: Handled by Express ONLY (nginx must NOT add CORS headers)`);
+  console.log('═══════════════════════════════════════════════════════════════');
   
   // Check if API key is configured
   if (!process.env.RETELL_API_KEY) {
@@ -211,25 +223,29 @@ app.listen(PORT, () => {
   }
   
   // Check CORS configuration
+  console.log('📋 CORS Configuration:');
+  console.log('   ✅ Priority domains: app.olliebot.ai, olliebot.ai, www.olliebot.ai');
+  
   if (process.env.UNIVERSAL_ACCESS === 'true') {
-    console.log('🌐 UNIVERSAL ACCESS MODE: Widget can be embedded on ANY website');
-    console.log('⚠️  WARNING: This allows ALL domains. Only use if you want a public widget.');
+    console.log('   🌐 UNIVERSAL ACCESS MODE: Widget can be embedded on ANY website');
+    console.log('   ⚠️  WARNING: This allows ALL domains. Only use if you want a public widget.');
   } else if (process.env.NODE_ENV === 'production') {
     if (!process.env.ALLOWED_ORIGINS) {
-      console.warn('⚠️  WARNING: ALLOWED_ORIGINS not configured for production!');
-      console.warn('⚠️  Options:');
-      console.warn('   - Set ALLOWED_ORIGINS=* for universal access');
-      console.warn('   - Set ALLOWED_ORIGINS=https://client1.com,https://client2.com for specific domains');
-      console.warn('   - Set UNIVERSAL_ACCESS=true for completely open access');
+      console.log('   ℹ️  ALLOWED_ORIGINS not set - using default olliebot.ai domains');
     } else {
       const origins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim());
       if (origins.includes('*')) {
-        console.log('🌐 WILDCARD ACCESS: Widget can be embedded on ANY website');
+        console.log('   🌐 WILDCARD ACCESS: Widget can be embedded on ANY website');
       } else {
-        console.log(`✅ CORS configured for specific origins: ${origins.join(', ')}`);
+        console.log(`   ✅ Additional allowed origins: ${origins.join(', ')}`);
       }
     }
   } else {
-    console.log('🔧 Development mode: CORS allows localhost origins');
+    console.log('   🔧 Development mode: CORS allows localhost origins');
   }
+  
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log('⚠️  IMPORTANT: If using nginx proxy, ensure it does NOT add');
+  console.log('    any Access-Control-* headers to avoid duplicate CORS headers!');
+  console.log('═══════════════════════════════════════════════════════════════');
 });
