@@ -67,14 +67,19 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo -e "${GREEN}Step 2: Configuring environment...${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-# Create .env file
+# Create .env file with proper configuration
 cat > server/.env << EOF
 RETELL_API_KEY=$RETELL_API_KEY
 UNIVERSAL_ACCESS=true
 NODE_ENV=production
 PORT=3001
+ALLOWED_ORIGINS=*
 EOF
 echo -e "${GREEN}✅ Environment configured for universal access${NC}"
+
+# Ensure server has proper permissions
+chmod 644 server/.env
+chown $USER:$USER server/.env
 
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

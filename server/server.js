@@ -16,37 +16,37 @@ app.use(helmet());
 // CORS configuration for universal widget deployment
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
+    // Always log the origin for debugging
+    console.log(`📍 Request from origin: ${origin || 'no-origin'}`);
     
-    // Check for universal access mode
-    if (process.env.UNIVERSAL_ACCESS === 'true') {
-      console.log(`✅ Universal access: Allowing request from: ${origin}`);
+    // Allow requests with no origin (mobile apps, Postman, server-to-server, etc.)
+    if (!origin) {
+      console.log('✅ Allowing request with no origin');
       return callback(null, true);
     }
     
-    // For development - allow localhost
-    if (process.env.NODE_ENV === 'development') {
-      const devOrigins = [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://localhost:8080',
-        'http://127.0.0.1:5173'
-      ];
-      if (devOrigins.some(devOrigin => origin.startsWith(devOrigin))) {
-        return callback(null, true);
-      }
+    // Check for universal access mode (highest priority)
+    if (process.env.UNIVERSAL_ACCESS === 'true') {
+      console.log(`✅ Universal access enabled: Allowing ${origin}`);
+      return callback(null, true);
     }
     
-    // Production: Get allowed origins from environment variable
+    // Check for wildcard in ALLOWED_ORIGINS
     const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
       process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
     
-    // Special handling for wildcard
     if (allowedOrigins.includes('*')) {
-      console.log(`🌐 Wildcard access: Allowing request from: ${origin}`);
+      console.log(`✅ Wildcard (*) in ALLOWED_ORIGINS: Allowing ${origin}`);
       return callback(null, true);
+    }
+    
+    // For development - allow all localhost variants
+    if (process.env.NODE_ENV !== 'production') {
+      const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('0.0.0.0');
+      if (isLocalhost) {
+        console.log(`✅ Development mode: Allowing localhost origin ${origin}`);
+        return callback(null, true);
+      }
     }
     
     // If no origins configured, decide based on environment
