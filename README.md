@@ -2,6 +2,29 @@
 
 A beautiful, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment configurations that work with **ANY domain**.
 
+## ⚡ Recent Improvements (v2.1 - Systemd Fix)
+
+**🎉 SYSTEMD DEPLOYMENT ISSUE FIXED!** 
+
+If you experienced systemd service failures with "Changing to the requested working directory failed" errors, these are now **completely resolved**!
+
+### ✅ What's Been Fixed:
+- **Robust path detection** - Uses absolute paths instead of relative ones
+- **Pre-deployment validation** - Checks all required files before creating services
+- **Better error diagnostics** - Clear messages when something goes wrong
+- **Dependency verification** - Ensures Node.js and packages are properly installed
+
+### 📁 New Files:
+- `systemd-fix.sh` - Emergency fix for existing broken deployments
+- `DEPLOYMENT-GUIDE.md` - Comprehensive guide for fresh server setups
+
+### 🔧 Updated Files:
+- `systemd-setup.sh` - Now bulletproof with absolute path detection and validation
+- `README-DEPLOYMENT.md` - Updated with fix information
+
+**For existing deployments:** Use `sudo ./systemd-fix.sh` to fix immediately  
+**For fresh deployments:** The updated scripts prevent the issue entirely
+
 ## 🔒 Security Features
 
 - **No API keys in client code** - All sensitive credentials stored server-side
@@ -99,17 +122,20 @@ sudo ./deploy.sh yourdomain.com nginx admin@yourdomain.com
 # Step 1: Setup Nginx (HTTP only initially)
 sudo ./nginx-setup-fixed.sh yourdomain.com
 
-# Step 2: Get SSL certificate
+# Step 2: Setup backend service (NOW FIXED!)
+sudo ./systemd-setup.sh
+
+# Step 3: Get SSL certificate
 sudo certbot certonly --webroot \
   -w /var/www/certbot \
   -d yourdomain.com \
   -d www.yourdomain.com \
   --email admin@yourdomain.com
 
-# Step 3: Enable HTTPS
+# Step 4: Enable HTTPS
 sudo ./enable-ssl.sh yourdomain.com
 
-# Step 4: Deploy application
+# Step 5: Deploy application
 npm run build
 sudo cp -r dist/* /var/www/retell-widget/dist/
 ```
@@ -169,7 +195,8 @@ All scripts accept domains as parameters - no modification needed!
 | `nginx-setup-fixed.sh` | Nginx configuration | `./nginx-setup-fixed.sh yourdomain.com [backend_port] [frontend_port]` |
 | `enable-ssl.sh` | Enable HTTPS | `./enable-ssl.sh yourdomain.com [backend_port]` |
 | `quick-fix.sh` | Fix SSL issues | `./quick-fix.sh yourdomain.com` |
-| `systemd-setup.sh` | Backend service | `./systemd-setup.sh` |
+| `systemd-setup.sh` | Backend service (FIXED) | `./systemd-setup.sh` |
+| `systemd-fix.sh` | **NEW:** Fix broken systemd | `sudo ./systemd-fix.sh` |
 
 ### 🔐 Production Security Checklist
 
@@ -290,10 +317,12 @@ sudo systemctl restart retell-backend
 
 | Issue | Solution |
 |-------|----------|
+| **Systemd service won't start** | **FIXED in v2.1!** Use `sudo ./systemd-fix.sh` for existing deployments |
 | SSL certificate error | Run `sudo ./quick-fix.sh yourdomain.com` then follow instructions |
-| Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-backend -n 50` |
+| Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-widget-backend -n 50` |
 | CORS errors | Update `ALLOWED_ORIGINS` in `.env` file |
 | Port already in use | Find process: `sudo lsof -i :3001` and kill it |
+| "Working directory failed" error | **FIXED!** Re-run `sudo ./systemd-setup.sh` with updated script |
 
 ### 📈 Performance Optimization
 
@@ -355,10 +384,12 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ### 🤝 Support & Documentation
 
-- **Detailed Deployment Guide:** See [README-DEPLOYMENT.md](./README-DEPLOYMENT.md)
-- **Script Documentation:** Each script has `--help` option
-- **Logs Location:** `/var/log/nginx/` and `journalctl`
-- **Configuration Files:** `/etc/nginx/sites-available/retell-widget`
+- **🔧 Systemd Fix:** See [systemd-fix.sh](./systemd-fix.sh) for immediate fixes
+- **📖 Comprehensive Guide:** See [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) for fresh server setups
+- **⚡ Quick Deployment:** See [README-DEPLOYMENT.md](./README-DEPLOYMENT.md) for overview
+- **🛠️ Script Documentation:** Each script has `--help` option
+- **📋 Logs Location:** `/var/log/nginx/` and `journalctl -u retell-widget-backend`
+- **⚙️ Configuration Files:** `/etc/nginx/sites-available/retell-widget`
 
 ### 📄 License
 
