@@ -1,10 +1,13 @@
-# Retell AI Widget - Secure Implementation
+# Retell AI Web Widget
 
-A beautiful, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment configurations that work with **ANY domain**.
+A secure, embeddable voice call widget for Retell AI with enterprise-grade security and production-ready deployment.
 
-> **🚀 Ready to Clone & Deploy**: This repository is designed for easy cloning and deployment by anyone.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 
-## 🎯 **New Here? ONE COMMAND DEPLOYMENT!**
+## 🚀 Quick Start
+
+### One-Command Deployment
 
 ```bash
 git clone https://github.com/yourusername/RetellAI-Web-Widget.git
@@ -13,186 +16,107 @@ chmod +x one-touch-deploy.sh
 ./one-touch-deploy.sh YOUR_RETELL_API_KEY your-domain.com your@email.com
 ```
 
-### ⚠️ Had CORS errors? Run this fix:
-```bash
-chmod +x fix-cors-duplicate.sh
-./fix-cors-duplicate.sh
-```
+### Manual Setup
 
-👉 **[ONE-TOUCH-DEPLOY.md](./ONE-TOUCH-DEPLOY.md)** - Complete deployment guide
+1. **Clone and Install**
+   ```bash
+   git clone https://github.com/yourusername/RetellAI-Web-Widget.git
+   cd RetellAI-Web-Widget
+   npm run setup  # Installs all dependencies
+   ```
 
-👉 **[WIDGET-INTEGRATION.md](./WIDGET-INTEGRATION.md)** - How to add widget to your site (fixes "RetellWidget is not defined")
+2. **Configure API Key**
+   ```bash
+   cd server
+   npm run setup:env  # Interactive environment configuration
+   ```
 
-👉 **[GETTING-STARTED.md](./GETTING-STARTED.md)** - Manual setup guide
+3. **Build and Test**
+   ```bash
+   npm run build
+   npm run server:start
+   cd server && npm test
+   ```
 
-👉 **[CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md)** - Detailed instructions
-
-## ⚡ Recent Improvements (v2.1 - Systemd Fix)
-
-**🎉 SYSTEMD DEPLOYMENT ISSUE FIXED!** 
-
-If you experienced systemd service failures with "Changing to the requested working directory failed" errors, these are now **completely resolved**!
-
-### ✅ What's Been Fixed:
-- **Robust path detection** - Uses absolute paths instead of relative ones
-- **Pre-deployment validation** - Checks all required files before creating services
-- **Better error diagnostics** - Clear messages when something goes wrong
-- **Dependency verification** - Ensures Node.js and packages are properly installed
-
-### 📁 New Files:
-- `systemd-fix.sh` - Emergency fix for existing broken deployments
-- `DEPLOYMENT-GUIDE.md` - Comprehensive guide for fresh server setups
-
-### 🔧 Updated Files:
-- `systemd-setup.sh` - Now bulletproof with absolute path detection and validation
-- `README-DEPLOYMENT.md` - Updated with fix information
-
-**For existing deployments:** Use `sudo ./systemd-fix.sh` to fix immediately  
-**For fresh deployments:** The updated scripts prevent the issue entirely
+4. **Deploy**
+   ```bash
+   npm run deploy:prepare
+   # Upload deployment/widget/* to your CDN
+   # Deploy deployment/server/* to your hosting service
+   ```
 
 ## 🔒 Security Features
 
-- **No API keys in client code** - All sensitive credentials stored server-side
+- **No API keys in client code** - All credentials stored server-side
 - **Proxy server architecture** - Backend handles all API authentication
-- **Rate limiting** - Prevents abuse and protects against attacks
+- **Rate limiting** - Protection against abuse and attacks
 - **CORS protection** - Configurable allowed origins
-- **Environment variables** - Secure credential management
 - **Helmet.js** - Additional security headers
-- **SSL/TLS support** - Full HTTPS encryption in production
+- **SSL/TLS support** - Full HTTPS encryption
 
-## 🚀 Quick Start
+## 🎨 Widget Integration
 
-### 1. Clone and Setup Everything
-```bash
-git clone https://github.com/yourusername/RetellAI-Web-Widget.git
-cd RetellAI-Web-Widget
-npm run setup  # Installs all dependencies and guides environment setup
+### Method 1: Built Files (Recommended)
+
+```html
+<!-- Include CSS and JS -->
+<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+<script src="https://your-cdn.com/retell-widget.js"></script>
+
+<!-- Initialize widget -->
+<script>
+  const widget = new RetellWidget({
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+    position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
+    theme: 'purple' // or 'blue', 'green'
+  });
+</script>
 ```
 
-### 2. Configure Your API Key
-```bash
-cd server
-npm run setup:env  # Interactive environment configuration
+### Method 2: Auto-initialization
+
+```html
+<script>
+  window.retellWidgetConfig = {
+    agentId: 'your_agent_id',
+    proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+    position: 'bottom-right',
+    theme: 'purple'
+  };
+</script>
+<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
+<script src="https://your-cdn.com/retell-widget.js"></script>
 ```
-
-This will ask for:
-- Your Retell AI API Key
-- Widget access mode (universal/specific domains)
-- Server configuration
-
-### 3. Build and Test
-```bash
-# Build the widget
-npm run build
-
-# Start the server
-npm run server:start
-
-# Test everything works
-cd server && npm test
-```
-
-### 4. Deploy
-```bash
-# Prepare deployment files
-npm run deploy:prepare
-
-# Upload deployment/widget/* to your CDN
-# Deploy deployment/server/* to your hosting service
-```
-
-**That's it!** Your widget is now ready to be embedded on any website.
 
 ## 📦 Production Deployment
 
-### 🎯 Domain-Agnostic Deployment
+### Nginx Deployment (Recommended)
 
-All deployment scripts are **fully parameterized** and work with **ANY domain** - no hardcoding required!
-
-### 🚀 One-Command Deployment
-
-Deploy to your domain with a single command:
-
-```bash
-# Deploy to YOUR domain (replace with your actual domain)
-sudo ./deploy.sh yourdomain.com nginx admin@yourdomain.com
-```
-
-This command will:
-- ✅ Install and configure Nginx
-- ✅ Set up SSL certificates (Let's Encrypt)
-- ✅ Configure security headers and rate limiting
-- ✅ Build and deploy your application
-- ✅ Set up systemd service for the backend
-- ✅ Enable HTTPS with auto-renewal
-
-### 🔧 Deployment Options
-
-#### Option 1: Nginx Reverse Proxy (Recommended)
-
-Perfect for VPS, dedicated servers, or cloud VMs (AWS EC2, DigitalOcean, Linode).
-
-**Quick Setup:**
 ```bash
 # Make scripts executable
 chmod +x *.sh
 
-# Run deployment with YOUR domain
-sudo ./deploy.sh yourdomain.com nginx admin@yourdomain.com
+# Deploy to your domain
+sudo ./one-touch-deploy.sh YOUR_RETELL_API_KEY yourdomain.com admin@yourdomain.com
 ```
 
-**Manual Setup:**
-```bash
-# Step 1: Setup Nginx (HTTP only initially)
-sudo ./nginx-setup-fixed.sh yourdomain.com
-
-# Step 2: Setup backend service (NOW FIXED!)
-sudo ./systemd-setup.sh
-
-# Step 3: Get SSL certificate
-sudo certbot certonly --webroot \
-  -w /var/www/certbot \
-  -d yourdomain.com \
-  --email admin@yourdomain.com
-
-# Step 4: Enable HTTPS
-sudo ./enable-ssl.sh yourdomain.com
-
-# Step 5: Deploy application
-npm run build
-sudo cp -r dist/* /var/www/retell-widget/dist/
-```
-
-#### Option 2: Docker Deployment
-
-Perfect for containerized environments:
+### Docker Deployment
 
 ```bash
-# Deploy with Docker
-./deploy.sh localhost docker
-
-# Or with a domain
-./deploy.sh yourdomain.com docker
-```
-
-Using Docker Compose:
-```bash
-# Build and start all services
+# Using Docker Compose
 docker-compose up -d
 
 # Check logs
 docker-compose logs -f
 ```
 
-#### Option 3: Platform-Specific Deployments
+### Platform Deployments
 
-**Vercel:**
+**Vercel (Frontend):**
 ```bash
-# Deploy frontend to Vercel
 vercel
-
-# Set environment variable for API endpoint
-VITE_API_URL=https://your-backend.herokuapp.com
+# Set VITE_API_URL=https://your-backend.herokuapp.com
 ```
 
 **Heroku (Backend):**
@@ -203,255 +127,92 @@ heroku config:set RETELL_API_KEY=your_key_here
 git push heroku main
 ```
 
-**Railway/Render:**
-- Connect GitHub repository
-- Set environment variables in dashboard
-- Deploy automatically on push
+## 🌐 Configuration
 
-### 🛠️ Script Reference
+### Environment Variables
 
-All scripts accept domains as parameters - no modification needed!
-
-| Script | Purpose | Usage |
-|--------|---------|-------|
-| `deploy.sh` | Complete deployment | `./deploy.sh yourdomain.com [nginx\|docker] [email]` |
-| `nginx-setup-fixed.sh` | Nginx configuration | `./nginx-setup-fixed.sh yourdomain.com [backend_port] [frontend_port]` |
-| `enable-ssl.sh` | Enable HTTPS | `./enable-ssl.sh yourdomain.com [backend_port]` |
-| `quick-fix.sh` | Fix SSL issues | `./quick-fix.sh yourdomain.com` |
-| `systemd-setup.sh` | Backend service (FIXED) | `./systemd-setup.sh` |
-| `systemd-fix.sh` | **NEW:** Fix broken systemd | `sudo ./systemd-fix.sh` |
-
-### 🌐 Domain Configuration
-
-All scripts now support **intelligent www detection**:
-
-- **Root domains** (`example.com`) → automatically includes `www.example.com`
-- **Subdomains** (`api.example.com`) → no www support (auto-detected)
-- **Override options** available: `--www` or `--no-www`
-
-**Examples:**
 ```bash
-# Auto-detection (recommended)
-sudo ./nginx-setup-fixed.sh example.com          # includes www
-sudo ./nginx-setup-fixed.sh api.example.com      # no www
+# Required
+RETELL_API_KEY=your_retell_api_key
 
-# Explicit control
-sudo ./nginx-setup-fixed.sh example.com --no-www # force no www
-sudo ./nginx-setup-fixed.sh api.example.com --www # force www
+# Optional
+PORT=3001                    # Backend server port
+NODE_ENV=production         # Environment mode
+ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 ```
 
-### 🔐 Production Security Checklist
+### CORS Configuration
 
-- [ ] **Environment Variables**
-  ```bash
-  # Production .env
-  RETELL_API_KEY=your_production_key
-  NODE_ENV=production
-  ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
-  ```
+Choose your access mode:
 
-- [ ] **Update CORS Origins**
-  ```javascript
-  // server/server.js - automatically uses ALLOWED_ORIGINS from .env
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
-    'https://yourdomain.com',
-    'https://app.yourdomain.com'
-  ];
-  ```
-
-- [ ] **SSL/TLS Configuration**
-  - Automatic with deployment scripts
-  - Uses Let's Encrypt for free certificates
-  - Auto-renewal configured via cron
-
-- [ ] **Rate Limiting**
-  - Pre-configured in Nginx (10 req/s for API)
-  - Adjustable in nginx configuration
-
-- [ ] **Monitoring Setup**
-  - Application logs: `sudo journalctl -u retell-backend -f`
-  - Nginx logs: `sudo tail -f /var/log/nginx/yourdomain-*.log`
-  - Health endpoint: `https://yourdomain.com/health`
-
-### 📊 Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Internet                            │
-└─────────────────┬───────────────────────────────────────────┘
-                  │ HTTPS (Port 443)
-┌─────────────────▼───────────────────────────────────────────┐
-│              Nginx Reverse Proxy                            │
-│  • SSL Termination  • Rate Limiting  • Security Headers     │
-└────────┬──────────────────────────────────┬─────────────────┘
-         │ /api/* (proxy)                   │ /* (static)
-┌────────▼────────────┐           ┌────────▼────────────┐
-│   Backend Server    │           │   Frontend Files    │
-│    (Port 3001)      │           │   (/var/www/...)    │
-│  • API Proxy        │           │  • React App        │
-│  • Authentication   │           │  • Widget Code      │
-└────────┬────────────┘           └─────────────────────┘
-         │ HTTPS + API Key
-┌────────▼────────────┐
-│    Retell AI API    │
-└─────────────────────┘
-```
-
-### 🎨 Widget Configuration
-
-#### Method 1: Include Built Files (Recommended)
-
-1. **Build the widget:**
+1. **Universal Access** (Anyone can embed):
    ```bash
-   npm install
-   npm run build
+   UNIVERSAL_ACCESS=true
    ```
 
-2. **Include the generated files in your HTML:**
-   ```html
-   <!-- Include CSS and JS (can be hosted on CDN) -->
-   <link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
-   <script src="https://your-cdn.com/retell-widget.js"></script>
-   
-   <!-- Initialize the widget -->
-   <script>
-     const widget = new RetellWidget({
-       agentId: 'your_agent_id',
-       proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // MUST be full URL for 3rd party sites
-       position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
-       theme: 'purple' // or 'blue', 'green'
-     });
-   </script>
+2. **Specific Domains**:
+   ```bash
+   ALLOWED_ORIGINS=https://client1.com,https://client2.com
    ```
 
-#### Method 2: Auto-initialization
+## 📊 Architecture
 
-```html
-<!-- Set config before loading script -->
-<script>
-  window.retellWidgetConfig = {
-    agentId: 'your_agent_id',
-    proxyEndpoint: 'https://your-backend-server.com/api/create-web-call', // Full URL required
-    position: 'bottom-right',
-    theme: 'purple'
-  };
-</script>
-<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
-<script src="https://your-cdn.com/retell-widget.js"></script>
+```
+┌──────────────────────────────────────────────────┐
+│                   Internet                       │
+└────────────────────┬─────────────────────────────┘
+                     │ HTTPS (443)
+┌────────────────────▼─────────────────────────────┐
+│              Nginx Reverse Proxy                 │
+│  • SSL Termination  • Rate Limiting  • Headers   │
+└──────┬─────────────────────────┬─────────────────┘
+       │ /api/*                  │ /* (static)
+┌──────▼──────────┐       ┌──────▼──────────┐
+│ Backend Server  │       │ Frontend Files  │
+│  (Port 3001)    │       │  (Widget/App)   │
+└──────┬──────────┘       └─────────────────┘
+       │ HTTPS + API Key
+┌──────▼──────────┐
+│  Retell AI API  │
+└─────────────────┘
 ```
 
-#### Configuration Options
+## 🔍 Testing & Monitoring
 
-```typescript
-interface WidgetConfig {
-  agentId: string;                    // Required: Your Retell AI agent ID
-  proxyEndpoint?: string;             // Required for 3rd party sites: Full URL to your backend
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-  theme?: 'purple' | 'blue' | 'green';
-}
-```
-
-#### 🌐 **Deployment Options**
-
-Choose the right deployment mode for your use case:
-
-**1. Universal Access (Anyone can embed):**
-```bash
-# .env configuration
-UNIVERSAL_ACCESS=true
-```
-
-**2. Wildcard Access (Any domain):**
-```bash
-# .env configuration  
-ALLOWED_ORIGINS=*
-```
-
-**3. Specific Domains Only:**
-```bash
-# .env configuration
-ALLOWED_ORIGINS=https://client1.com,https://client2.com,*.clients.example.com
-```
-
-**Universal Integration Example:**
-```html
-<!-- Can be embedded on ANY website -->
-<link rel="stylesheet" href="https://your-cdn.com/retell-widget.css">
-<script src="https://your-cdn.com/retell-widget.js"></script>
-<script>
-  new RetellWidget({
-    agentId: 'your_agent_id',
-    proxyEndpoint: 'https://your-backend.com/api/create-web-call'
-  });
-</script>
-```
-
-### 🔍 Testing & Monitoring
-
-#### Health Checks
+### Health Checks
 
 ```bash
-# Check backend health
+# Backend health
 curl https://yourdomain.com/api/health
 
-# Check frontend
+# Frontend
 curl https://yourdomain.com/
 
-# Check SSL certificate
+# SSL certificate
 curl -vI https://yourdomain.com
 ```
 
-#### Monitor Services
+### Monitoring
 
 ```bash
-# Backend logs (systemd)
+# Backend logs
 sudo journalctl -u retell-backend -f
 
-# Nginx access logs
+# Nginx logs
 sudo tail -f /var/log/nginx/yourdomain-access.log
-
-# Nginx error logs
 sudo tail -f /var/log/nginx/yourdomain-error.log
 ```
 
-### 🚨 Troubleshooting
-
-#### Quick Fixes
-
-```bash
-# SSL configuration issues
-sudo ./quick-fix.sh yourdomain.com
-
-# Test Nginx configuration
-sudo nginx -t
-
-# Restart services
-sudo systemctl restart nginx
-sudo systemctl restart retell-backend
-```
-
-#### Common Issues
+## 🚨 Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| **Systemd service won't start** | **FIXED in v2.1!** Use `sudo ./systemd-fix.sh` for existing deployments |
-| SSL certificate error | Run `sudo ./quick-fix.sh yourdomain.com` then follow instructions |
-| Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-widget-backend -n 50` |
+| SSL certificate error | Run `sudo ./enable-ssl.sh yourdomain.com` |
+| Backend won't start | Check `.env` file and logs: `sudo journalctl -u retell-backend -n 50` |
 | CORS errors | Update `ALLOWED_ORIGINS` in `.env` file |
 | Port already in use | Find process: `sudo lsof -i :3001` and kill it |
-| "Working directory failed" error | **FIXED!** Re-run `sudo ./systemd-setup.sh` with updated script |
 
-### 📈 Performance Optimization
-
-The deployment scripts automatically configure:
-
-- **Gzip Compression** - Reduces bandwidth by 70%
-- **Static Asset Caching** - 30-day cache for images/CSS/JS
-- **HTTP/2** - Multiplexed connections for faster loading
-- **Keep-Alive** - Persistent connections
-- **Rate Limiting** - Prevents abuse and DDoS
-
-### 🔄 Updating Your Deployment
+## 🔄 Updating
 
 ```bash
 # Pull latest changes
@@ -467,69 +228,65 @@ sudo cp -r dist/* /var/www/retell-widget/dist/
 sudo systemctl restart retell-backend
 ```
 
-### 🌍 Multiple Domain Support
+## 📚 Documentation
 
-Deploy to multiple domains easily:
+- [Integration Example](deployment/integration-example.html) - Complete HTML example
+- [Server Documentation](server/README.md) - Backend setup details
 
-```bash
-# Deploy to first domain
-sudo ./deploy.sh domain1.com nginx admin@domain1.com
+## 🛠️ Development
 
-# Deploy to second domain
-sudo ./deploy.sh domain2.com nginx admin@domain2.com
+### Project Structure
+
+```
+RetellAI-Web-Widget/
+├── deployment/          # Production-ready files
+│   ├── widget/         # Built widget files
+│   └── server/         # Backend server
+├── server/             # Backend source
+├── src/                # Frontend source
+│   ├── components/     # React components
+│   └── widget.ts       # Widget entry point
+└── nginx/              # Nginx configuration
 ```
 
-Each domain gets its own:
-- Nginx configuration
-- SSL certificate
-- Log files
-- Monitoring
-
-### 📝 Environment Variables
-
-Complete list of supported environment variables:
+### Available Scripts
 
 ```bash
-# Required
-RETELL_API_KEY=your_retell_api_key
-
-# Optional
-PORT=3001                    # Backend server port
-NODE_ENV=production          # Environment (development/production)
-ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
+npm run setup           # Install all dependencies
+npm run build          # Build widget for production
+npm run dev            # Start development server
+npm run server:start   # Start backend server
+npm run server:test    # Test backend API
+npm run deploy:prepare # Prepare deployment files
 ```
 
-### 🤝 Support & Documentation
+## 🤝 Support
 
-#### 🚀 **Getting Started**
-- **⚡ Quick Start:** [GETTING-STARTED.md](./GETTING-STARTED.md) - **NEW USERS START HERE**
-- **🔄 Complete Setup:** [CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md) - Detailed instructions
-- **🌍 Universal Deployment:** [universal-widget-deployment.md](./universal-widget-deployment.md)
-- **🎯 Widget Integration:** [widget-usage-guide.md](./widget-usage-guide.md)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/RetellAI-Web-Widget/issues)
+- **Documentation**: Check the `/deployment` folder for integration examples
 
-#### 📚 **Advanced Deployment**
-- **🌐 Cross-Domain Deployment:** [cross-domain-deployment-guide.md](./cross-domain-deployment-guide.md)
-- **📋 Deployment Checklist:** [deployment-checklist.md](./deployment-checklist.md)
-- **🔧 Systemd Fix:** [systemd-fix.sh](./systemd-fix.sh) for immediate fixes
-- **📖 Comprehensive Guide:** [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) for fresh server setups
-- **⚡ Quick Deployment:** [README-DEPLOYMENT.md](./README-DEPLOYMENT.md) for overview
+## 👨‍💼 About the Developer
 
-#### 🛠️ **Technical Reference**
-- **🛠️ Script Documentation:** Each script has `--help` option
-- **📋 Logs Location:** `/var/log/nginx/` and `journalctl -u retell-widget-backend`
-- **⚙️ Configuration Files:** `/etc/nginx/sites-available/retell-widget`
+<div align="center">
+  <a href="https://linktr.ee/marioaldyauz">
+    <img src="https://raw.githubusercontent.com/marioaldayuz/branding-assets/1acedbb7ac71e4066529372064eb7a907823e064/marioaldayuz-qr-code.png" alt="Mario Aldayuz QR Code" width="200"/>
+  </a>
+</div>
 
-### 📄 License
+**Coach Mario Aldayuz** is a 7-year SaaS & HighLevel Veteran with over 15 years of Marketing, Sales, and Entrepreneurship experience. Having quarterbacked several successful startup launches and exits Mario understands what drives both business owner and consumer making him the ideal well rounded coach for your HighLevel SaaSpreneur journey.
 
-MIT License - Use freely in your projects!
+If you are serious about scaling your business and ready for value packed coaching join Mario Aldayuz to learn everything from HighLevel to N8N to Artificial Intelligence to SaaS & Business operations.
+
+🔗 **Consulting Services**: [OllieBot.ai](https://olliebot.ai) - N8N and HighLevel consulting service
+
+## 🌊 Hosting Partner
+
+[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=c28f896d5736&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+
+## 📄 License
+
+MIT License - See [LICENSE.md](LICENSE.md) for details
 
 ---
 
-**Key Features:**
-- 🎯 **Domain-agnostic** - Works with ANY domain
-- 🔒 **Secure by default** - No API keys in client code
-- 🚀 **One-command deployment** - Production-ready in minutes
-- 📦 **Multiple deployment options** - Nginx, Docker, or manual
-- 🛡️ **Enterprise-grade security** - SSL, CORS, rate limiting
-- 📊 **Production monitoring** - Health checks and logging
-- 🔄 **Easy updates** - Simple upgrade process
+**Built with** ❤️ **using** TypeScript, React, Express, and Vite
