@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 3001;
 app.use((req, res, next) => {
   // Set headers only if not already set
   if (!res.headersSent) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
