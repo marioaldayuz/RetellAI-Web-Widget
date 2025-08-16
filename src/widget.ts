@@ -4,8 +4,13 @@ import { RetellWebClient } from 'retell-client-js-sdk';
 interface WidgetConfig {
   agentId: string;
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-  theme?: 'purple' | 'blue' | 'green';
   proxyEndpoint?: string;
+  // New customization options
+  primaryColor?: string;
+  secondaryColor?: string;
+  bubbleIcon?: string; // Font Awesome icon class (e.g., 'fa-headset', 'fa-message', 'fa-robot')
+  welcomeMessage?: string;
+  buttonLabel?: string;
 }
 
 interface CallState {
@@ -18,7 +23,9 @@ interface CallState {
 class RetellWidget {
   private config: WidgetConfig;
   private container: HTMLElement | null = null;
+  private bubble: HTMLElement | null = null;
   private retellClient: RetellWebClient | null = null;
+  private isExpanded: boolean = false;
   private callState: CallState = {
     isActive: false,
     startTime: null,
@@ -30,40 +37,71 @@ class RetellWidget {
   constructor(config: WidgetConfig) {
     this.config = {
       position: 'bottom-right',
-      theme: 'purple',
-      proxyEndpoint: '/api/create-web-call', // Default to relative, but should be full URL for 3rd party sites
+      proxyEndpoint: '/api/create-web-call',
+      primaryColor: '#9333ea',
+      secondaryColor: '#a855f7',
+      bubbleIcon: 'fa-headset',
+      welcomeMessage: 'How can I help you today?',
+      buttonLabel: 'Start Conversation',
       ...config
     };
     this.init();
   }
 
   private init(): void {
+    this.loadFontAwesome();
     this.createWidget();
     this.setupEventListeners();
   }
 
+  private loadFontAwesome(): void {
+    // Check if Font Awesome is already loaded
+    if (!document.querySelector('link[href*="font-awesome"]') && !document.querySelector('link[href*="fontawesome"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css';
+      document.head.appendChild(link);
+    }
+  }
+
   private createWidget(): void {
     // Remove existing widget if any
-    const existing = document.getElementById('retell-widget');
+    const existing = document.getElementById('retell-widget-container');
     if (existing) {
       existing.remove();
     }
 
-    // Create container
-    this.container = document.createElement('div');
-    this.container.id = 'retell-widget';
-    this.container.className = 'retell-widget';
+    // Create main container
+    const mainContainer = document.createElement('div');
+    mainContainer.id = 'retell-widget-container';
+    mainContainer.className = 'retell-widget-container';
     
     // Set position styles
     const positionStyles = this.getPositionStyles();
-    Object.assign(this.container.style, {
+    Object.assign(mainContainer.style, {
       position: 'fixed',
       zIndex: '999999',
       ...positionStyles
     });
 
+    // Create chat bubble
+    this.bubble = document.createElement('div');
+    this.bubble.id = 'retell-bubble';
+    this.bubble.className = 'retell-bubble';
+    this.bubble.innerHTML = this.getBubbleHTML();
+    
+    // Create expanded window
+    this.container = document.createElement('div');
+    this.container.id = 'retell-widget';
+    this.container.className = 'retell-widget retell-widget-hidden';
     this.container.innerHTML = this.getWidgetHTML();
-    document.body.appendChild(this.container);
+
+    mainContainer.appendChild(this.bubble);
+    mainContainer.appendChild(this.container);
+    document.body.appendChild(mainContainer);
+
+    // Apply custom colors
+    this.applyCustomColors();
   }
 
   private getPositionStyles(): Record<string, string> {
@@ -85,101 +123,120 @@ class RetellWidget {
     }
   }
 
-  private getThemeColors(): Record<string, string> {
-    const themes = {
-      purple: {
-        primary: '#9333ea',
-        secondary: '#a855f7',
-        accent: '#c084fc'
-      },
-      blue: {
-        primary: '#2563eb',
-        secondary: '#3b82f6',
-        accent: '#60a5fa'
-      },
-      green: {
-        primary: '#059669',
-        secondary: '#10b981',
-        accent: '#34d399'
-      }
-    };
-    return themes[this.config.theme || 'purple'];
+  private getBubbleHTML(): string {
+    return `
+      <button id="retell-bubble-btn" class="retell-bubble-button" aria-label="Open chat">
+        <i class="fas ${this.config.bubbleIcon} retell-bubble-icon"></i>
+        <span class="retell-bubble-badge"></span>
+      </button>
+    `;
   }
 
   private getWidgetHTML(): string {
-    const colors = this.getThemeColors();
-    
     return `
-      <div class="bg-gray-900/90 retell-widget-glassmorphism backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-4 min-w-[280px] retell-widget-fade-in">
+      <div class="retell-widget-window">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-2">
-            <div class="w-3 h-3 rounded-full" style="background: ${colors.primary}"></div>
-            <span class="text-white font-medium text-sm">AI Assistant</span>
+        <div class="retell-widget-header">
+          <div class="retell-widget-header-content">
+            <div class="retell-widget-status-dot"></div>
+            <span class="retell-widget-title">AI Assistant</span>
           </div>
-          <button id="retell-close-btn" class="text-gray-400 hover:text-white transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+          <div class="retell-widget-header-actions">
+            <button id="retell-minimize-btn" class="retell-widget-header-btn" aria-label="Minimize">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button id="retell-close-btn" class="retell-widget-header-btn" aria-label="Close">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Call Status -->
-        <div id="retell-status" class="text-center mb-4">
-          <div id="retell-idle-state">
-            <div class="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center retell-widget-glassmorphism" 
-                 style="background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary})">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-              </svg>
-            </div>
-            <p class="text-gray-300 text-sm mb-4">Ready to start a conversation</p>
+        <!-- Content -->
+        <div class="retell-widget-content">
+          <!-- Welcome Message -->
+          <div id="retell-welcome-message" class="retell-widget-message">
+            ${this.config.welcomeMessage}
           </div>
 
-          <div id="retell-active-state" class="hidden">
-            <div class="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" 
-                 style="background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary})">
-              <div id="retell-speech-indicator" class="flex items-center space-x-1">
-                <div class="w-1 h-4 retell-widget-speech-bar rounded-full" style="background: white"></div>
-                <div class="w-1 h-4 retell-widget-speech-bar rounded-full" style="background: white"></div>
-                <div class="w-1 h-4 retell-widget-speech-bar rounded-full" style="background: white"></div>
-                <div class="w-1 h-4 retell-widget-speech-bar rounded-full" style="background: white"></div>
+          <!-- Main Button Area -->
+          <div class="retell-widget-button-area">
+            <!-- Microphone Button -->
+            <button id="retell-call-btn" class="retell-widget-mic-button">
+              <div id="retell-mic-icon" class="retell-widget-mic-icon">
+                <i class="fas fa-microphone"></i>
               </div>
+              <div id="retell-sound-waves" class="retell-widget-sound-waves retell-widget-hidden">
+                <div class="sound-wave sound-wave-1"></div>
+                <div class="sound-wave sound-wave-2"></div>
+                <div class="sound-wave sound-wave-3"></div>
+              </div>
+            </button>
+            
+            <!-- Button Label -->
+            <div id="retell-button-label" class="retell-widget-button-label">
+              ${this.config.buttonLabel}
             </div>
-            <div id="retell-timer" class="text-white font-mono text-lg mb-2">00:00</div>
-            <p class="text-gray-300 text-sm mb-4">Call in progress...</p>
           </div>
-        </div>
 
-        <!-- Controls -->
-        <div class="flex justify-center space-x-3">
-          <button id="retell-call-btn" 
-                  class="retell-widget-button px-6 py-3 rounded-xl font-medium text-white transition-all duration-300 shadow-lg"
-                  style="background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary})">
-            <span id="retell-call-text">Start Call</span>
-          </button>
-          
-          <button id="retell-mute-btn" 
-                  class="retell-widget-button hidden px-4 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300">
-            <svg id="retell-mute-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-            </svg>
-          </button>
-        </div>
+          <!-- Timer -->
+          <div id="retell-timer-container" class="retell-widget-timer-container retell-widget-hidden">
+            <div id="retell-timer" class="retell-widget-timer">00:00</div>
+          </div>
 
-        <!-- Error Message -->
-        <div id="retell-error" class="hidden mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-          <p class="text-red-300 text-sm text-center"></p>
+          <!-- Mute Button -->
+          <div id="retell-mute-container" class="retell-widget-mute-container retell-widget-hidden">
+            <button id="retell-mute-btn" class="retell-widget-mute-btn">
+              <i id="retell-mute-icon" class="fas fa-microphone"></i>
+            </button>
+          </div>
+
+          <!-- Error Message -->
+          <div id="retell-error" class="retell-widget-error retell-widget-hidden">
+            <p id="retell-error-text"></p>
+          </div>
         </div>
       </div>
     `;
   }
 
+  private applyCustomColors(): void {
+    const style = document.createElement('style');
+    style.textContent = `
+      :root {
+        --retell-primary: ${this.config.primaryColor};
+        --retell-secondary: ${this.config.secondaryColor};
+      }
+      .retell-bubble-button {
+        background: linear-gradient(135deg, ${this.config.primaryColor}, ${this.config.secondaryColor});
+      }
+      .retell-widget-header {
+        background: linear-gradient(135deg, ${this.config.primaryColor}, ${this.config.secondaryColor});
+      }
+      .retell-widget-mic-button {
+        background: linear-gradient(135deg, ${this.config.primaryColor}, ${this.config.secondaryColor});
+      }
+      .retell-widget-mic-button:hover {
+        background: linear-gradient(135deg, ${this.config.secondaryColor}, ${this.config.primaryColor});
+      }
+      .retell-widget-status-dot {
+        background: #10b981;
+      }
+      .sound-wave {
+        background: white;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   private setupEventListeners(): void {
-    if (!this.container) return;
+    // Bubble click
+    const bubbleBtn = document.querySelector('#retell-bubble-btn');
+    bubbleBtn?.addEventListener('click', () => {
+      this.toggleWidget();
+    });
 
     // Call button
-    const callBtn = this.container.querySelector('#retell-call-btn') as HTMLButtonElement;
+    const callBtn = document.querySelector('#retell-call-btn');
     callBtn?.addEventListener('click', () => {
       if (this.callState.isActive) {
         this.endCall();
@@ -189,16 +246,39 @@ class RetellWidget {
     });
 
     // Mute button
-    const muteBtn = this.container.querySelector('#retell-mute-btn') as HTMLButtonElement;
+    const muteBtn = document.querySelector('#retell-mute-btn');
     muteBtn?.addEventListener('click', () => {
       this.toggleMute();
     });
 
-    // Close button
-    const closeBtn = this.container.querySelector('#retell-close-btn') as HTMLButtonElement;
-    closeBtn?.addEventListener('click', () => {
-      this.minimize();
+    // Minimize button
+    const minimizeBtn = document.querySelector('#retell-minimize-btn');
+    minimizeBtn?.addEventListener('click', () => {
+      this.toggleWidget();
     });
+
+    // Close button
+    const closeBtn = document.querySelector('#retell-close-btn');
+    closeBtn?.addEventListener('click', () => {
+      if (this.callState.isActive) {
+        this.endCall();
+      }
+      this.toggleWidget();
+    });
+  }
+
+  private toggleWidget(): void {
+    this.isExpanded = !this.isExpanded;
+    
+    if (this.isExpanded) {
+      this.bubble?.classList.add('retell-bubble-hidden');
+      this.container?.classList.remove('retell-widget-hidden');
+      this.container?.classList.add('retell-widget-visible');
+    } else {
+      this.bubble?.classList.remove('retell-bubble-hidden');
+      this.container?.classList.remove('retell-widget-visible');
+      this.container?.classList.add('retell-widget-hidden');
+    }
   }
 
   private async startCall(): Promise<void> {
@@ -302,7 +382,7 @@ class RetellWidget {
         const elapsed = Math.floor((Date.now() - this.callState.startTime) / 1000);
         const minutes = Math.floor(elapsed / 60);
         const seconds = elapsed % 60;
-        const timerElement = this.container?.querySelector('#retell-timer');
+        const timerElement = document.querySelector('#retell-timer');
         if (timerElement) {
           timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
@@ -311,98 +391,110 @@ class RetellWidget {
   }
 
   private updateUI(): void {
-    if (!this.container) return;
-
-    const idleState = this.container.querySelector('#retell-idle-state');
-    const activeState = this.container.querySelector('#retell-active-state');
-    const callBtn = this.container.querySelector('#retell-call-btn') as HTMLButtonElement;
-    const callText = this.container.querySelector('#retell-call-text');
-    const muteBtn = this.container.querySelector('#retell-mute-btn');
+    const welcomeMessage = document.querySelector('#retell-welcome-message');
+    const buttonLabel = document.querySelector('#retell-button-label');
+    const timerContainer = document.querySelector('#retell-timer-container');
+    const muteContainer = document.querySelector('#retell-mute-container');
+    const micIcon = document.querySelector('#retell-mic-icon');
+    const soundWaves = document.querySelector('#retell-sound-waves');
+    const callBtn = document.querySelector('#retell-call-btn');
 
     if (this.callState.isActive) {
-      idleState?.classList.add('hidden');
-      activeState?.classList.remove('hidden');
-      muteBtn?.classList.remove('hidden');
-      if (callText) callText.textContent = 'End Call';
-      callBtn?.classList.add('bg-red-500', 'hover:bg-red-600');
+      welcomeMessage?.classList.add('retell-widget-hidden');
+      timerContainer?.classList.remove('retell-widget-hidden');
+      muteContainer?.classList.remove('retell-widget-hidden');
+      
+      if (buttonLabel) {
+        (buttonLabel as HTMLElement).textContent = 'End Call';
+      }
+      
+      callBtn?.classList.add('retell-widget-mic-button-active');
+      
+      // Show sound waves when speaking
+      if (this.callState.isSpeaking) {
+        micIcon?.classList.add('retell-widget-hidden');
+        soundWaves?.classList.remove('retell-widget-hidden');
+      } else {
+        micIcon?.classList.remove('retell-widget-hidden');
+        soundWaves?.classList.add('retell-widget-hidden');
+      }
     } else {
-      idleState?.classList.remove('hidden');
-      activeState?.classList.add('hidden');
-      muteBtn?.classList.add('hidden');
-      if (callText) callText.textContent = 'Start Call';
-      callBtn?.classList.remove('bg-red-500', 'hover:bg-red-600');
+      welcomeMessage?.classList.remove('retell-widget-hidden');
+      timerContainer?.classList.add('retell-widget-hidden');
+      muteContainer?.classList.add('retell-widget-hidden');
+      micIcon?.classList.remove('retell-widget-hidden');
+      soundWaves?.classList.add('retell-widget-hidden');
+      
+      if (buttonLabel) {
+        (buttonLabel as HTMLElement).textContent = this.config.buttonLabel || 'Start Conversation';
+      }
+      
+      callBtn?.classList.remove('retell-widget-mic-button-active');
     }
 
     this.updateMuteButton();
   }
 
   private updateMuteButton(): void {
-    if (!this.container) return;
-
-    const muteIcon = this.container.querySelector('#retell-mute-icon');
-    if (!muteIcon) return;
+    const muteIcon = document.querySelector('#retell-mute-icon');
+    const muteBtn = document.querySelector('#retell-mute-btn');
+    
+    if (!muteIcon || !muteBtn) return;
 
     if (this.callState.isMuted) {
-      muteIcon.innerHTML = `
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
-      `;
+      muteIcon.className = 'fas fa-microphone-slash';
+      muteBtn.classList.add('retell-widget-mute-btn-muted');
     } else {
-      muteIcon.innerHTML = `
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-      `;
+      muteIcon.className = 'fas fa-microphone';
+      muteBtn.classList.remove('retell-widget-mute-btn-muted');
     }
   }
 
   private updateSpeechIndicator(): void {
-    if (!this.container) return;
+    const micIcon = document.querySelector('#retell-mic-icon');
+    const soundWaves = document.querySelector('#retell-sound-waves');
 
-    const speechBars = this.container.querySelectorAll('.retell-widget-speech-bar');
-    speechBars.forEach(bar => {
+    if (this.callState.isActive) {
       if (this.callState.isSpeaking) {
-        (bar as HTMLElement).style.animationPlayState = 'running';
+        micIcon?.classList.add('retell-widget-hidden');
+        soundWaves?.classList.remove('retell-widget-hidden');
       } else {
-        (bar as HTMLElement).style.animationPlayState = 'paused';
+        micIcon?.classList.remove('retell-widget-hidden');
+        soundWaves?.classList.add('retell-widget-hidden');
       }
-    });
+    }
   }
 
   private showLoading(): void {
-    const callText = this.container?.querySelector('#retell-call-text');
-    if (callText) callText.textContent = 'Connecting...';
+    const buttonLabel = document.querySelector('#retell-button-label');
+    if (buttonLabel) {
+      (buttonLabel as HTMLElement).textContent = 'Connecting...';
+    }
   }
 
   private hideLoading(): void {
-    const callText = this.container?.querySelector('#retell-call-text');
-    if (callText) callText.textContent = 'Start Call';
+    const buttonLabel = document.querySelector('#retell-button-label');
+    if (buttonLabel) {
+      (buttonLabel as HTMLElement).textContent = this.config.buttonLabel || 'Start Conversation';
+    }
   }
 
   private showError(message: string): void {
-    if (!this.container) return;
-
-    const errorElement = this.container.querySelector('#retell-error');
-    const errorText = errorElement?.querySelector('p');
+    const errorElement = document.querySelector('#retell-error');
+    const errorText = document.querySelector('#retell-error-text');
     
     if (errorElement && errorText) {
-      errorText.textContent = message;
-      errorElement.classList.remove('hidden');
+      (errorText as HTMLElement).textContent = message;
+      errorElement.classList.remove('retell-widget-hidden');
       
       setTimeout(() => {
-        errorElement.classList.add('hidden');
+        errorElement.classList.add('retell-widget-hidden');
       }, 5000);
     }
   }
 
-  private minimize(): void {
-    if (this.container) {
-      this.container.style.display = 'none';
-    }
-  }
-
   public show(): void {
-    if (this.container) {
-      this.container.style.display = 'block';
-    }
+    this.toggleWidget();
   }
 
   public destroy(): void {
@@ -410,10 +502,13 @@ class RetellWidget {
       this.endCall();
     }
     
-    if (this.container) {
-      this.container.remove();
-      this.container = null;
+    const container = document.querySelector('#retell-widget-container');
+    if (container) {
+      container.remove();
     }
+    
+    this.container = null;
+    this.bubble = null;
   }
 }
 
