@@ -102,9 +102,9 @@ if ! command -v nginx &> /dev/null; then
 fi
 
 # Copy widget files to Nginx directory
-sudo mkdir -p /var/www/$YOUR_DOMAIN/widget
-sudo cp dist/retell-widget.js /var/www/$YOUR_DOMAIN/widget/
-sudo cp dist/retell-widget.css /var/www/$YOUR_DOMAIN/widget/
+sudo mkdir -p /var/www/$YOUR_DOMAIN
+sudo cp dist/retell-widget.js /var/www/$YOUR_DOMAIN/
+sudo cp dist/retell-widget.css /var/www/$YOUR_DOMAIN/
 sudo chown -R www-data:www-data /var/www/$YOUR_DOMAIN
 
 # Configure Nginx
@@ -113,9 +113,9 @@ server {
     listen 80;
     server_name $YOUR_DOMAIN;
 
-    # Widget files
-    location /widget/ {
-        alias /var/www/$YOUR_DOMAIN/widget/;
+    # Widget files served from root
+    location ~ \.(js|css)$ {
+        root /var/www/$YOUR_DOMAIN;
         add_header Access-Control-Allow-Origin "*";
         add_header Cache-Control "public, max-age=3600";
     }
@@ -194,8 +194,8 @@ echo -e "${GREEN}║           🎉 DEPLOYMENT COMPLETE! 🎉                   
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}Your widget is now live at:${NC}"
-echo "  • https://$YOUR_DOMAIN/widget/retell-widget.js"
-echo "  • https://$YOUR_DOMAIN/widget/retell-widget.css"
+echo "  • https://$YOUR_DOMAIN/retell-widget.js"
+echo "  • https://$YOUR_DOMAIN/retell-widget.css"
 echo ""
 echo -e "${BLUE}Your API endpoint:${NC}"
 echo "  • https://$YOUR_DOMAIN/api/create-web-call"
@@ -206,12 +206,14 @@ echo -e "${YELLOW}COPY THIS WIDGET CODE TO ANY WEBSITE:${NC}"
 echo ""
 cat << EOF
 <!-- RetellAI Widget Integration Code -->
-<link rel="stylesheet" href="https://$YOUR_DOMAIN/widget/retell-widget.css">
-<script src="https://$YOUR_DOMAIN/widget/retell-widget.js"></script>
+<link rel="stylesheet" href="https://$YOUR_DOMAIN/retell-widget.css">
+<script src="https://$YOUR_DOMAIN/retell-widget.js"></script>
 <script>
-  new RetellWidget({
+  const widget = new RetellWidget({
     agentId: 'your_agent_id_here',  // Replace with your Retell agent ID
-    proxyEndpoint: 'https://$YOUR_DOMAIN/api/create-web-call'
+    proxyEndpoint: 'https://$YOUR_DOMAIN/api/create-web-call',
+    position: 'bottom-right',  // or 'bottom-left', 'top-right', 'top-left'
+    theme: 'purple'  // or 'blue', 'green'
   });
 </script>
 EOF

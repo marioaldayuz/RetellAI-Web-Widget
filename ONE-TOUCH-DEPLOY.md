@@ -46,12 +46,14 @@ You'll get this output ready to copy-paste:
 
 ```html
 <!-- RetellAI Widget Integration Code -->
-<link rel="stylesheet" href="https://your-domain.com/widget/retell-widget.css">
-<script src="https://your-domain.com/widget/retell-widget.js"></script>
+<link rel="stylesheet" href="https://your-domain.com/retell-widget.css">
+<script src="https://your-domain.com/retell-widget.js"></script>
 <script>
-  new RetellWidget({
+  const widget = new RetellWidget({
     agentId: 'your_agent_id_here',  // Replace with your Retell agent ID
-    proxyEndpoint: 'https://your-domain.com/api/create-web-call'
+    proxyEndpoint: 'https://your-domain.com/api/create-web-call',
+    position: 'bottom-right',  // or 'bottom-left', 'top-right', 'top-left'
+    theme: 'purple'  // or 'blue', 'green'
   });
 </script>
 ```
@@ -67,7 +69,7 @@ The script automatically:
    - Certbot for SSL
 
 2. **Configures Nginx**
-   - Serves widget files at `/widget/`
+   - Serves widget files from root domain
    - Proxies API calls to backend
    - Sets up CORS headers
 
@@ -107,8 +109,8 @@ sudo systemctl start retell-widget-backend
 curl https://your-domain.com/health
 
 # Check widget files
-curl -I https://your-domain.com/widget/retell-widget.js
-curl -I https://your-domain.com/widget/retell-widget.css
+curl -I https://your-domain.com/retell-widget.js
+curl -I https://your-domain.com/retell-widget.css
 ```
 
 ## 🚨 Troubleshooting

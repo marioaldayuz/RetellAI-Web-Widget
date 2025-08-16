@@ -54,12 +54,14 @@ curl -X POST http://localhost:3001/api/create-web-call \
 ## Widget Code (Use on ANY website):
 
 ```html
-<link rel="stylesheet" href="https://YOUR-DOMAIN/widget/retell-widget.css">
-<script src="https://YOUR-DOMAIN/widget/retell-widget.js"></script>
+<link rel="stylesheet" href="https://YOUR-DOMAIN/retell-widget.css">
+<script src="https://YOUR-DOMAIN/retell-widget.js"></script>
 <script>
-  new RetellWidget({
+  const widget = new RetellWidget({
     agentId: 'your_agent_id_here',  // From Retell Dashboard
-    proxyEndpoint: 'https://YOUR-DOMAIN/api/create-web-call'
+    proxyEndpoint: 'https://YOUR-DOMAIN/api/create-web-call',
+    position: 'bottom-right',  // or 'bottom-left', 'top-right', 'top-left'
+    theme: 'purple'  // or 'blue', 'green'
   });
 </script>
 ```

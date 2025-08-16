@@ -13,20 +13,22 @@ The widget files **MUST** be loaded in this exact order:
 <html>
 <head>
     <!-- 1. Load the CSS file in the head -->
-    <link rel="stylesheet" href="https://your-domain.com/widget/retell-widget.css">
+    <link rel="stylesheet" href="https://your-domain.com/retell-widget.css">
 </head>
 <body>
     <!-- Your website content -->
     
     <!-- 2. Load the JavaScript file BEFORE using RetellWidget -->
-    <script src="https://your-domain.com/widget/retell-widget.js"></script>
+    <script src="https://your-domain.com/retell-widget.js"></script>
     
     <!-- 3. THEN create the widget -->
     <script>
         // Now RetellWidget is available
-        new RetellWidget({
+        const widget = new RetellWidget({
             agentId: 'your_agent_id_here',
-            proxyEndpoint: 'https://your-backend.com/api/create-web-call'
+            proxyEndpoint: 'https://your-backend.com/api/create-web-call',
+            position: 'bottom-right',
+            theme: 'purple'
         });
     </script>
 </body>
@@ -71,8 +73,8 @@ The widget files **MUST** be loaded in this exact order:
 ## 📦 After One-Touch Deployment
 
 If you used the `one-touch-deploy.sh` script, your widget files are at:
-- CSS: `https://your-domain.com/widget/retell-widget.css`
-- JS: `https://your-domain.com/widget/retell-widget.js`
+- CSS: `https://your-domain.com/retell-widget.css`
+- JS: `https://your-domain.com/retell-widget.js`
 
 ## 💡 Working Example
 
@@ -87,20 +89,22 @@ Save this as `test.html` and open in your browser:
     <title>RetellAI Widget Test</title>
     
     <!-- Replace with your actual domain -->
-    <link rel="stylesheet" href="https://your-domain.com/widget/retell-widget.css">
+    <link rel="stylesheet" href="https://your-domain.com/retell-widget.css">
 </head>
 <body>
     <h1>My Website</h1>
     <p>The voice call widget will appear in the corner.</p>
     
     <!-- Replace with your actual domain -->
-    <script src="https://your-domain.com/widget/retell-widget.js"></script>
+    <script src="https://your-domain.com/retell-widget.js"></script>
     
     <script>
         // Create widget after script loads
-        new RetellWidget({
+        const widget = new RetellWidget({
             agentId: 'your_agent_id_here',  // Replace with your agent ID
-            proxyEndpoint: 'https://your-domain.com/api/create-web-call'
+            proxyEndpoint: 'https://your-domain.com/api/create-web-call',
+            position: 'bottom-right',
+            theme: 'purple'
         });
     </script>
 </body>
@@ -116,17 +120,19 @@ function loadRetellWidget() {
     // Load CSS
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://your-domain.com/widget/retell-widget.css';
+    link.href = 'https://your-domain.com/retell-widget.css';
     document.head.appendChild(link);
     
     // Load JS
     const script = document.createElement('script');
-    script.src = 'https://your-domain.com/widget/retell-widget.js';
+    script.src = 'https://your-domain.com/retell-widget.js';
     script.onload = function() {
         // Script loaded, now create widget
-        new RetellWidget({
+        const widget = new RetellWidget({
             agentId: 'your_agent_id_here',
-            proxyEndpoint: 'https://your-domain.com/api/create-web-call'
+            proxyEndpoint: 'https://your-domain.com/api/create-web-call',
+            position: 'bottom-right',
+            theme: 'purple'
         });
     };
     document.body.appendChild(script);
