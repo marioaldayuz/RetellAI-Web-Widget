@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const fetch = require('node-fetch');
 
 // Load environment variables
 dotenv.config();
@@ -42,15 +43,6 @@ app.get('/health', (req, res) => {
 app.post('/api/create-web-call', async (req, res) => {
   try {
     console.log('Creating web call from:', req.headers.origin || 'unknown');
-    
-    // Dynamic import for node-fetch
-    let fetch;
-    try {
-      fetch = require('node-fetch');
-    } catch (e) {
-      const { default: fetchModule } = await import('node-fetch');
-      fetch = fetchModule;
-    }
     
     if (!process.env.RETELL_API_KEY) {
       console.error('Missing RETELL_API_KEY');
