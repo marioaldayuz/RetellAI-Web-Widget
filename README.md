@@ -15,6 +15,8 @@ chmod +x one-touch-deploy.sh
 
 👉 **[ONE-TOUCH-DEPLOY.md](./ONE-TOUCH-DEPLOY.md)** - Complete deployment guide
 
+👉 **[WIDGET-INTEGRATION.md](./WIDGET-INTEGRATION.md)** - How to add widget to your site (fixes "RetellWidget is not defined")
+
 👉 **[GETTING-STARTED.md](./GETTING-STARTED.md)** - Manual setup guide
 
 👉 **[CLONE-AND-DEPLOY.md](./CLONE-AND-DEPLOY.md)** - Detailed instructions

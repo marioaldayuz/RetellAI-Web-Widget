@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetellAI Widget Test</title>
+    
+    <!-- IMPORTANT: Include the widget CSS and JS files -->
+    <link rel="stylesheet" href="dist/retell-widget.css">
+</head>
+<body>
+    <h1>RetellAI Widget Test Page</h1>
+    <p>The widget should appear in the bottom-right corner.</p>
+    
+    <!-- IMPORTANT: Load the widget JS BEFORE trying to use RetellWidget -->
+    <script src="dist/retell-widget.js"></script>
+    
+    <!-- Now you can use RetellWidget -->
+    <script>
+        // Wait for the script to load and then create the widget
+        if (typeof RetellWidget !== 'undefined') {
+            console.log('RetellWidget is loaded!');
+            
+            // Create the widget
+            const widget = new RetellWidget({
+                agentId: 'your_agent_id_here',  // Replace with your actual agent ID
+                proxyEndpoint: '/api/create-web-call',  // Or full URL for production
+                position: 'bottom-right',
+                theme: 'purple'
+            });
+            
+            console.log('Widget created successfully!');
+        } else {
+            console.error('RetellWidget is not defined! Make sure the script is loaded.');
+        }
+    </script>
+</body>
+</html>
