@@ -27,7 +27,7 @@ RetellAI Web Widget is a production-ready, embeddable voice assistant that trans
 ### One-Command Deployment
 
 ```bash
-git clone https://github.com/yourusername/RetellAI-Web-Widget.git
+git clone https://github.com/marioaldayuz/RetellAI-Web-Widget.git
 cd RetellAI-Web-Widget
 chmod +x one-touch-deploy.sh
 ./one-touch-deploy.sh YOUR_RETELL_API_KEY your-domain.com your@email.com
